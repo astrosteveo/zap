@@ -218,7 +218,7 @@ Examples:
   zap list
 
 For more help: zap help <command>
-Documentation: https://github.com/user/zap
+Documentation: https://github.com/astrosteveo/zap
 EOF
 
   return 0
@@ -704,7 +704,7 @@ _zap_cmd_doctor() {
     echo "Status: ✗ $issues_found issue(s) found"
     echo ""
     echo "Please address the issues above."
-    echo "For help, see: https://github.com/user/zap/issues"
+    echo "For help, see: https://github.com/astrosteveo/zap/issues"
   fi
 
   return 0

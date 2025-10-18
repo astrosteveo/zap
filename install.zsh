@@ -100,7 +100,7 @@ elif [[ -f "$(dirname "$0")/zap.zsh" ]]; then
   cp -r "$(dirname "$0")" "$ZAP_INSTALL_DIR"
 else
   # Default: clone from GitHub
-  git clone --depth 1 https://github.com/user/zap.git "$ZAP_INSTALL_DIR" >/dev/null 2>&1
+  git clone --depth 1 https://github.com/astrosteveo/zap.git "$ZAP_INSTALL_DIR" >/dev/null 2>&1
 fi
 
 print_success "Cloned Zap to $ZAP_INSTALL_DIR"
@@ -162,5 +162,5 @@ echo "  zap load zsh-users/zsh-syntax-highlighting"
 echo "  zap load zsh-users/zsh-autosuggestions@v0.7.0"
 echo "  zap load ohmyzsh/ohmyzsh path:plugins/git"
 echo ""
-echo "Documentation: https://github.com/user/zap"
+echo "Documentation: https://github.com/astrosteveo/zap"
 echo ""

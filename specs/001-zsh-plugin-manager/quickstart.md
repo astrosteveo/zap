@@ -18,14 +18,14 @@ Zap is a lightweight, easy-to-use plugin manager for Zsh. It's designed to be a 
 ### One-Command Install
 
 ```bash
-curl -sL https://raw.githubusercontent.com/user/zap/main/install.zsh | zsh
+curl -sL https://raw.githubusercontent.com/astrosteveo/zap/main/install.zsh | zsh
 ```
 
 ### Manual Install
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/user/zap ~/.zap
+   git clone https://github.com/astrosteveo/zap ~/.zap
    ```
 
 2. Add to your `~/.zshrc`:
@@ -370,8 +370,8 @@ Zap never blocks shell startup, so a broken plugin won't lock you out.
 
 ## Getting Help
 
-- **Documentation**: Visit https://github.com/user/zap
-- **Issues**: Report bugs at https://github.com/user/zap/issues
+- **Documentation**: Visit https://github.com/astrosteveo/zap
+- **Issues**: Report bugs at https://github.com/astrosteveo/zap/issues
 - **Diagnostics**: Run `zap doctor` for automated troubleshooting
 - **Help**: Run `zap help` for command reference
 

@@ -17,7 +17,7 @@ A modern, minimal Zsh plugin manager designed for speed and simplicity.
 
 ```bash
 # Clone the repository
-git clone https://github.com/user/zap ~/.zap
+git clone https://github.com/astrosteveo/zap ~/.zap
 
 # Add to your ~/.zshrc
 echo 'source ~/.zap/zap.zsh' >> ~/.zshrc
