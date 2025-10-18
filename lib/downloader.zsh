@@ -33,6 +33,25 @@ _zap_clone_plugin() {
 
   # Check if already cloned
   if [[ -d "$cache_dir/.git" ]]; then
+    # If this is a sparse checkout and a subdirectory is requested, add it
+    # WHY: Multiple Oh-My-Zsh plugins need their own subdirectories added to sparse checkout
+    if [[ -n "$subdir" ]]; then
+      (
+        cd "$cache_dir" 2>/dev/null || exit 1
+        # Check if sparse checkout is active
+        if git sparse-checkout list >/dev/null 2>&1; then
+          # Check if this subdirectory is already in sparse checkout
+          if ! git sparse-checkout list | grep -q "^${subdir}$"; then
+            # Add subdirectory to sparse checkout
+            git sparse-checkout add "$subdir" 2>/dev/null
+            # Fetch and checkout the new files
+            # WHY: With --filter=blob:none, files aren't fetched until explicitly requested
+            timeout 10 git fetch --depth 1 2>/dev/null
+            git checkout 2>/dev/null
+          fi
+        fi
+      )
+    fi
     return 0
   fi
 

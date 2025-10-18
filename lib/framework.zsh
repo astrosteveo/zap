@@ -113,14 +113,12 @@ _zap_ensure_framework() {
       local repo="ohmyzsh"
       local cache_dir="$(_zap_get_plugin_cache_dir "$owner" "$repo")"
 
-      # Check if Oh-My-Zsh base is already installed
-      if [[ -d "$cache_dir/.git" ]]; then
-        _zap_setup_oh_my_zsh
-        return 0
-      fi
-
       # Download Oh-My-Zsh base (FR-017: automatic detection and installation)
-      _zap_print_downloading "ohmyzsh/ohmyzsh (framework base)"
+      # WHY: Always call _zap_clone_plugin even if cache exists, because it handles
+      # adding new subdirectories to existing sparse checkouts
+      if [[ ! -d "$cache_dir/.git" ]]; then
+        _zap_print_downloading "ohmyzsh/ohmyzsh (framework base)"
+      fi
 
       # Use sparse checkout if subdirectory specified to avoid downloading 300+ plugins
       if _zap_clone_plugin "$owner" "$repo" "" "$subdir"; then
@@ -138,14 +136,12 @@ _zap_ensure_framework() {
       local repo="prezto"
       local cache_dir="$(_zap_get_plugin_cache_dir "$owner" "$repo")"
 
-      # Check if Prezto base is already installed
-      if [[ -d "$cache_dir/.git" ]]; then
-        _zap_setup_prezto
-        return 0
-      fi
-
       # Download Prezto base (FR-017: automatic detection and installation)
-      _zap_print_downloading "sorin-ionescu/prezto (framework base)"
+      # WHY: Always call _zap_clone_plugin even if cache exists, because it handles
+      # adding new subdirectories to existing sparse checkouts
+      if [[ ! -d "$cache_dir/.git" ]]; then
+        _zap_print_downloading "sorin-ionescu/prezto (framework base)"
+      fi
 
       # Use sparse checkout if subdirectory specified
       if _zap_clone_plugin "$owner" "$repo" "" "$subdir"; then
