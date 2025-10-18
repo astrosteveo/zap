@@ -75,17 +75,47 @@ echo ""
 
 # Determine installation directory
 ZAP_INSTALL_DIR="${ZAP_DIR:-$HOME/.zap}"
+ZAP_DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/zap"
 
 # Check if already installed (FR-001: exit code 2 for already installed)
 if [[ -d "$ZAP_INSTALL_DIR" && -f "$ZAP_INSTALL_DIR/zap.zsh" ]]; then
   print_warning "Zap already installed at $ZAP_INSTALL_DIR"
+  echo ""
   read "REPLY?Reinstall? [y/N] "
   if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
     print_info "Installation cancelled"
     exit 2
   fi
-  print_info "Removing existing installation..."
-  rm -rf "$ZAP_INSTALL_DIR"
+
+  echo ""
+  print_info "Choose installation type:"
+  echo "  ${GREEN}1${NC}) Regular reinstall (keep plugins and cache)"
+  echo "  ${GREEN}2${NC}) Clean install (remove everything, fresh start)"
+  echo ""
+  read "INSTALL_TYPE?Enter choice [1]: "
+  INSTALL_TYPE="${INSTALL_TYPE:-1}"
+
+  if [[ "$INSTALL_TYPE" == "2" ]]; then
+    # Clean install - zap it all out!
+    print_warning "Clean install will remove:"
+    print_info "  • Installation: $ZAP_INSTALL_DIR"
+    print_info "  • Data/cache:   $ZAP_DATA_DIR"
+    print_info "  • All downloaded plugins and history"
+    echo ""
+    read "CONFIRM?Are you sure? [y/N] "
+    if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
+      print_info "Installation cancelled"
+      exit 2
+    fi
+    print_info "Performing clean install..."
+    rm -rf "$ZAP_INSTALL_DIR"
+    rm -rf "$ZAP_DATA_DIR"
+    print_success "Cleaned installation and data directories"
+  else
+    # Regular reinstall - keep data
+    print_info "Reinstalling (keeping plugins and cache)..."
+    rm -rf "$ZAP_INSTALL_DIR"
+  fi
 fi
 
 # Clone repository
@@ -106,7 +136,6 @@ fi
 print_success "Cloned Zap to $ZAP_INSTALL_DIR"
 
 # Create data directory (FR-001, XDG spec)
-ZAP_DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/zap"
 mkdir -p "$ZAP_DATA_DIR/plugins" 2>/dev/null
 
 print_success "Created data directory at $ZAP_DATA_DIR"
