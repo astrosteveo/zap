@@ -60,6 +60,13 @@ source "$ZAP_DIR/lib/defaults.zsh"
 #
 zap() {
   local subcommand="$1"
+
+  # Show help if no arguments provided
+  if [[ -z "$subcommand" ]]; then
+    _zap_cmd_help
+    return 0
+  fi
+
   shift
 
   case "$subcommand" in
