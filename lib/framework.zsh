@@ -61,7 +61,14 @@ _zap_setup_oh_my_zsh() {
   export ZSH_CUSTOM="$ZAP_DATA_DIR/oh-my-zsh-custom"
 
   # Create cache directories
-  mkdir -p "$ZSH_CACHE_DIR" "$ZSH_CUSTOM" 2>/dev/null
+  # WHY: Completions directory is needed for dynamic completion generation (e.g., kubectl)
+  mkdir -p "$ZSH_CACHE_DIR/completions" "$ZSH_CUSTOM" 2>/dev/null
+
+  # Add completions directory to fpath
+  # WHY: Oh-My-Zsh plugins generate completions into ZSH_CACHE_DIR/completions
+  if [[ -d "$ZSH_CACHE_DIR/completions" ]] && (( ! ${fpath[(I)$ZSH_CACHE_DIR/completions]} )); then
+    fpath=("$ZSH_CACHE_DIR/completions" $fpath)
+  fi
 
   return 0
 }

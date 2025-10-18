@@ -804,9 +804,8 @@ _zap_cmd_uninstall() {
   return 0
 }
 
-# Initialize completion system if not already done
+# Initialize completion system
 # WHY: Run compinit once after all plugins loaded (FR-022)
-if ! (( $+functions[compinit] )); then
-  autoload -Uz compinit
-  compinit
-fi
+# Must be called to activate completions - autoload alone isn't enough
+autoload -Uz compinit
+compinit -i  # -i flag: silently ignore insecure directories
