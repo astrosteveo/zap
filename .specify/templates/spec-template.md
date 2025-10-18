@@ -114,3 +114,36 @@
 - **SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
 - **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]
 
+## Quality Requirements *(reference constitution)*
+
+<!--
+  ACTION REQUIRED: Define quality requirements per constitution principles.
+  These enforce code quality, testing, UX, and performance standards.
+-->
+
+### Performance Budgets
+
+- **API Response Time**: p95 latency < [specify target, e.g., 200ms for reads, 500ms for writes]
+- **Page Load Time**: Time to Interactive < [specify target, e.g., 3 seconds on 3G]
+- **Memory**: [specify constraints, e.g., RSS growth < 10% over 24 hours under load]
+- **Other**: [domain-specific metrics, e.g., throughput, concurrent users]
+
+### UX & Accessibility
+
+- **Consistency**: [Describe alignment with existing UI patterns and terminology]
+- **Accessibility**: [Specify requirements: keyboard nav, screen reader, color contrast, etc.]
+- **Response Feedback**: User actions acknowledged within 100ms; operations complete or show progress within 1s
+- **Error Handling**: Error messages must be actionable and user-friendly
+
+### Testing Requirements
+
+- **Test-First**: TDD workflow required (tests written before implementation)
+- **Coverage**: [Specify minimum coverage, default 80% for core business logic]
+- **Test Types**: Contract tests (API boundaries) + Integration tests (user journeys) required; unit tests optional unless specified
+
+### Code Quality Standards
+
+- **Documentation**: Public APIs must include docstrings (purpose, parameters, returns, exceptions)
+- **Review**: All code changes require peer review before merging
+- **Maintainability**: Code must follow single responsibility principle; complexity must be justified
+

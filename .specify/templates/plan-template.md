@@ -31,7 +31,16 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+Verify compliance with `.specify/memory/constitution.md`:
+
+- [ ] **Code Quality**: Architecture supports single responsibility; APIs will be documented; comments explain WHY not WHAT
+- [ ] **Test-First**: Plan includes test phases before implementation phases
+- [ ] **UX Consistency**: User-facing changes align with existing patterns; accessibility considered
+- [ ] **Performance**: Performance budgets defined (API < 200ms p95, page load < 3s, memory stable)
+- [ ] **Documentation**: Docs organized in structured directories (specs/, docs/); no random .md files in root
+- [ ] **Quality Gates**: Definition of Done criteria established; code review process defined
+
+*If any gate fails, document justification in Complexity Tracking section below.*
 
 ## Project Structure
 

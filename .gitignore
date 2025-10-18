@@ -1,0 +1,31 @@
+# Zsh artifacts
+*.zwc
+*.zcompdump
+.zcompcache/
+
+# Test artifacts
+*.log
+test-results/
+coverage/
+.bats-cache/
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.local
+.env.*
+
+# Temporary files
+*.tmp
+*.bak
+.cache/
