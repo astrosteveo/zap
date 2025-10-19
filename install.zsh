@@ -2,10 +2,20 @@
 #
 # install.zsh - Zap installation script
 #
-# Usage: curl -sL https://raw.githubusercontent.com/user/zap/main/install.zsh | zsh
+# Usage: curl -sL https://raw.githubusercontent.com/astrosteveo/zap/main/install.zsh | zsh
 #        OR: zsh install.zsh
 #
 # WHY: One-command installation enables quick onboarding (FR-001, SC-001)
+#
+# NOTE: When piped from curl, interactive prompts are skipped (stdin not available)
+#       For clean install option, download and run: zsh install.zsh
+
+# Ensure running under Zsh (not bash)
+if [ -z "$ZSH_VERSION" ]; then
+  echo "Error: This script requires Zsh. Please run with: zsh install.zsh" >&2
+  echo "Or use: curl -sL https://raw.githubusercontent.com/astrosteveo/zap/main/install.zsh | zsh" >&2
+  exit 1
+fi
 
 set -e  # Exit on error
 
@@ -57,9 +67,15 @@ ZSH_MAJOR="${ZSH_VERSION_NUM%%.*}"
 if (( ZSH_MAJOR < 5 )); then
   print_warning "Zsh version $ZSH_VERSION_NUM detected"
   print_info "Zap requires Zsh 5.0 or later for full functionality"
-  read "REPLY?Continue anyway? [y/N] "
-  if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
-    exit 1
+
+  # Only prompt if interactive
+  if [[ -t 0 ]]; then
+    read "REPLY?Continue anyway? [y/N] "
+    if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
+      exit 1
+    fi
+  else
+    print_info "Continuing anyway (non-interactive mode)"
   fi
 fi
 
@@ -81,40 +97,52 @@ ZAP_DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/zap"
 if [[ -d "$ZAP_INSTALL_DIR" && -f "$ZAP_INSTALL_DIR/zap.zsh" ]]; then
   print_warning "Zap already installed at $ZAP_INSTALL_DIR"
   echo ""
-  read "REPLY?Reinstall? [y/N] "
-  if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
-    print_info "Installation cancelled"
-    exit 2
-  fi
 
-  echo ""
-  print_info "Choose installation type:"
-  echo "  ${GREEN}1${NC}) Regular reinstall (keep plugins and cache)"
-  echo "  ${GREEN}2${NC}) Clean install (remove everything, fresh start)"
-  echo ""
-  read "INSTALL_TYPE?Enter choice [1]: "
-  INSTALL_TYPE="${INSTALL_TYPE:-1}"
-
-  if [[ "$INSTALL_TYPE" == "2" ]]; then
-    # Clean install - zap it all out!
-    print_warning "Clean install will remove:"
-    print_info "  • Installation: $ZAP_INSTALL_DIR"
-    print_info "  • Data/cache:   $ZAP_DATA_DIR"
-    print_info "  • All downloaded plugins and history"
+  # Check if stdin is available for interactive prompts
+  # WHY: When piped from curl, stdin is used for script content, not user input
+  if [[ ! -t 0 ]]; then
+    # Non-interactive mode (piped from curl)
+    print_info "Non-interactive mode: performing regular reinstall (keeping plugins and cache)"
+    print_info "For clean install option, download and run directly: zsh install.zsh"
     echo ""
-    read "CONFIRM?Are you sure? [y/N] "
-    if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
+    rm -rf "$ZAP_INSTALL_DIR"
+  else
+    # Interactive mode (direct execution)
+    read "REPLY?Reinstall? [y/N] "
+    if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
       print_info "Installation cancelled"
       exit 2
     fi
-    print_info "Performing clean install..."
-    rm -rf "$ZAP_INSTALL_DIR"
-    rm -rf "$ZAP_DATA_DIR"
-    print_success "Cleaned installation and data directories"
-  else
-    # Regular reinstall - keep data
-    print_info "Reinstalling (keeping plugins and cache)..."
-    rm -rf "$ZAP_INSTALL_DIR"
+
+    echo ""
+    print_info "Choose installation type:"
+    echo "  ${GREEN}1${NC}) Regular reinstall (keep plugins and cache)"
+    echo "  ${GREEN}2${NC}) Clean install (remove everything, fresh start)"
+    echo ""
+    read "INSTALL_TYPE?Enter choice [1]: "
+    INSTALL_TYPE="${INSTALL_TYPE:-1}"
+
+    if [[ "$INSTALL_TYPE" == "2" ]]; then
+      # Clean install - zap it all out!
+      print_warning "Clean install will remove:"
+      print_info "  • Installation: $ZAP_INSTALL_DIR"
+      print_info "  • Data/cache:   $ZAP_DATA_DIR"
+      print_info "  • All downloaded plugins and history"
+      echo ""
+      read "CONFIRM?Are you sure? [y/N] "
+      if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
+        print_info "Installation cancelled"
+        exit 2
+      fi
+      print_info "Performing clean install..."
+      rm -rf "$ZAP_INSTALL_DIR"
+      rm -rf "$ZAP_DATA_DIR"
+      print_success "Cleaned installation and data directories"
+    else
+      # Regular reinstall - keep data
+      print_info "Reinstalling (keeping plugins and cache)..."
+      rm -rf "$ZAP_INSTALL_DIR"
+    fi
   fi
 fi
 
