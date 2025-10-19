@@ -254,10 +254,40 @@ Zap provides sensible defaults out of the box, even with zero plugins:
 
 ### Keybindings
 
-- **Delete**: Deletes character under cursor
-- **Home**: Moves to beginning of line
-- **End**: Moves to end of line
-- **Page Up / Page Down**: Scrolls through command history
+Zap provides working keybindings out of the box (based on Oh-My-Zsh):
+
+**Smart History Search** (the killer feature!):
+- Start typing a command, then press **Up/Down arrows**
+- Only shows commands that start with what you've typed
+- Example: Type `git` then Up arrow → only see git commands
+
+**Navigation:**
+- **Home / End**: Beginning/end of line
+- **Ctrl-Left / Ctrl-Right**: Move by word
+- **Page Up / Page Down**: Full history navigation
+- **Ctrl-R**: Reverse incremental search
+
+**Editing:**
+- **Delete / Backspace**: Delete character
+- **Ctrl-Delete**: Kill word forward
+- **Ctrl-U / Ctrl-K**: Kill line backward/forward
+- **Ctrl-W**: Kill word backward
+- **Ctrl-X Ctrl-E**: Edit command in $EDITOR
+
+**Completion:**
+- **Tab**: Complete and cycle
+- **Shift-Tab**: Reverse cycle
+
+**Mode Support:**
+- **Emacs mode** (default): Ctrl-A, Ctrl-E, Ctrl-R, Ctrl-U, Ctrl-K, etc.
+- **Vi mode**: Fully supported! Add `bindkey -v` before sourcing zap
+  ```zsh
+  # In ~/.zshrc
+  bindkey -v              # Enable vi mode
+  source ~/.zap/zap.zsh   # Then source zap
+  ```
+
+All navigation keys work in both modes.
 
 ### Tab Completion
 
@@ -265,6 +295,55 @@ Basic tab completion works immediately:
 - Command completion
 - File/directory completion
 - Option completion for common commands
+- Case-insensitive matching
+
+### Prompt
+
+Zap includes a simple, fast built-in prompt:
+
+```
+user@host ~/projects/zap main ❯
+```
+
+Features:
+- Shows username@hostname (only on remote/SSH or when root)
+- Current directory with ~ expansion
+- Git branch (if in git repo)
+- Color-coded prompt (green = success, red = last command failed)
+- Zero dependencies, pure Zsh
+
+**Want a fancier prompt?** Use Starship!
+
+[Starship](https://starship.rs/) is a fast, beautiful, cross-shell prompt written in Rust.
+
+Install Starship:
+```bash
+curl -sS https://starship.rs/install.sh | sh
+```
+
+Enable in your `~/.zshrc` (**before** sourcing zap):
+```zsh
+# Disable zap's built-in prompt
+export ZAP_DISABLE_PROMPT=true
+
+# Enable Starship
+eval "$(starship init zsh)"
+
+# Then source zap
+source ~/.zap/zap.zsh
+
+# Load plugins...
+zap load zsh-users/zsh-syntax-highlighting
+```
+
+**Why Starship?**
+- Shows git status, language versions (Node, Python, Rust, etc.)
+- Customizable modules
+- Fast (Rust compiled binary)
+- Works across shells (zsh, bash, fish, powershell)
+- Beautiful defaults
+
+**Or use any custom prompt!** Just set `ZAP_DISABLE_PROMPT=true` and configure your own.
 
 ## Performance Tips
 

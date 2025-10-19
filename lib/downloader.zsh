@@ -46,8 +46,8 @@ _zap_clone_plugin() {
             git sparse-checkout add "$subdir" 2>/dev/null
             # Fetch and checkout the new files
             # WHY: With --filter=blob:none, files aren't fetched until explicitly requested
-            timeout 10 git fetch --depth 1 2>/dev/null
-            git checkout 2>/dev/null
+            timeout 10 git fetch --depth 1 >/dev/null 2>&1
+            git checkout >/dev/null 2>&1
           fi
         fi
       )
@@ -59,7 +59,12 @@ _zap_clone_plugin() {
   mkdir -p "$(dirname "$cache_dir")" 2>/dev/null
 
   # Show download progress (FR-024)
-  _zap_print_downloading "$plugin_id"
+  # WHY: Show subdirectory for framework plugins to clarify what's being loaded
+  if [[ -n "$subdir" && ("$owner" == "ohmyzsh" || "$owner" == "sorin-ionescu") ]]; then
+    _zap_print_downloading "$owner/$repo/$subdir"
+  else
+    _zap_print_downloading "$plugin_id"
+  fi
 
   # Construct Git URL (support GitHub, GitLab, Bitbucket)
   # WHY: Default to HTTPS for GitHub but allow any Git hosting (FR-003)

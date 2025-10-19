@@ -47,6 +47,16 @@ source "$ZAP_DIR/lib/framework.zsh"
 # Source defaults (sensible keybindings and completions)
 source "$ZAP_DIR/lib/defaults.zsh"
 
+# Source terminal support (window titles)
+# WHY: Automatically sets terminal title to show running command
+source "$ZAP_DIR/lib/termsupport.zsh"
+
+# Source simple built-in prompt (opt-out via ZAP_DISABLE_PROMPT=true)
+# WHY: Provide clean, fast prompt out of the box. Users can disable if using Starship/custom prompt.
+if [[ "$ZAP_DISABLE_PROMPT" != true ]]; then
+  source "$ZAP_DIR/lib/prompt.zsh"
+fi
+
 #
 # zap - Main command dispatcher
 #
@@ -814,5 +824,21 @@ _zap_cmd_uninstall() {
 # Initialize completion system
 # WHY: Run compinit once after all plugins loaded (FR-022)
 # Must be called to activate completions - autoload alone isn't enough
+
+# First, check for completion security issues (Constitution Principle VI: Security)
+source "$ZAP_DIR/lib/compfix.zsh"
+
+# Initialize completions
+# WHY: compinit activates the completion system. Must run after all plugins loaded.
 autoload -Uz compinit
-compinit -i  # -i flag: silently ignore insecure directories
+
+# If compfix found insecure directories, compinit won't run properly
+# WHY: _zap_handle_completion_insecurities returns 1 if insecure dirs found
+if _zap_handle_completion_insecurities; then
+  # Secure - run compinit normally
+  compinit -C  # -C flag: skip security check since we just did it
+else
+  # Insecure - completions disabled, warning already shown
+  # WHY: Don't load completions from insecure directories (security risk)
+  :
+fi

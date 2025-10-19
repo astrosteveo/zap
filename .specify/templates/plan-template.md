@@ -35,9 +35,11 @@ Verify compliance with `.specify/memory/constitution.md`:
 
 - [ ] **Code Quality**: Architecture supports single responsibility; APIs will be documented; comments explain WHY not WHAT
 - [ ] **Test-First**: Plan includes test phases before implementation phases
-- [ ] **UX Consistency**: User-facing changes align with existing patterns; accessibility considered
-- [ ] **Performance**: Performance budgets defined (API < 200ms p95, page load < 3s, memory stable)
+- [ ] **UX Consistency**: User-facing changes align with existing patterns; platform-appropriate accessibility considered
+- [ ] **Performance**: Performance budgets defined appropriate to domain and platform; budgets are measurable and enforceable
 - [ ] **Documentation**: Docs organized in structured directories (specs/, docs/); no random .md files in root
+- [ ] **Security**: Input validation strategy defined; least privilege principle applied; secure defaults ensured
+- [ ] **Observability**: Logging, error tracking, and debugging support planned; appropriate to platform
 - [ ] **Quality Gates**: Definition of Done criteria established; code review process defined
 
 *If any gate fails, document justification in Complexity Tracking section below.*

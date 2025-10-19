@@ -1,18 +1,24 @@
 <!--
 Sync Impact Report:
-- Version change: 1.0.0 → 1.1.0
+- Version change: 1.1.0 → 1.2.0
 - Modified principles:
-  * I. Code Quality & Maintainability (EXPANDED: Added "Comments Explain WHY, Not WHAT" sub-principle)
+  * III. User Experience Consistency (GENERALIZED: Removed web/mobile-specific requirements; now platform-agnostic)
+    - ADDED: "Respect Standard Behaviors" requirement (keybindings, shortcuts, platform conventions)
+  * IV. Performance & Scalability (GENERALIZED: Removed hard-coded numeric targets; now domain-agnostic with requirement to define budgets)
 - Added sections:
-  * V. Documentation Organization (NEW PRINCIPLE: Structured docs, forbidden root clutter, cleanup discipline)
+  * VI. Security (NEW PRINCIPLE: Input validation, least privilege, secure defaults, vulnerability response)
+  * VII. Observability (NEW PRINCIPLE: Logging, monitoring, debugging, error tracking)
 - Removed sections: None
+- Reorganized sections:
+  * Development Workflow (SIMPLIFIED: Detailed checklists moved to project-specific CLAUDE.md; constitution retains high-level process requirements)
 - Templates requiring updates:
-  ✅ plan-template.md (UPDATED: Constitution Check section now includes documentation organization gate)
-  ✅ spec-template.md (NO CHANGE NEEDED: Quality Requirements section already comprehensive)
-  ✅ tasks-template.md (NO CHANGE NEEDED: TDD workflow already enforced)
-  ✅ checklist-template.md (NO CHANGE NEEDED: can generate doc organization checklist via command)
-  ✅ agent-file-template.md (NO CHANGE NEEDED: development guidelines align with principles)
-- Follow-up TODOs: None
+  ✅ spec-template.md (UPDATED: Added Security and Observability requirement sections)
+  ✅ plan-template.md (UPDATED: Constitution Check now includes all 7 principles)
+  ✅ tasks-template.md (NO CHANGE NEEDED: TDD workflow remains unchanged)
+  ✅ CLAUDE.md (UPDATED: Added Zsh-specific UX standards, Default Keybindings, Security practices, Observability examples)
+- Follow-up TODOs:
+  * Consider creating docs/CONTRIBUTING.md with detailed development workflow for human contributors
+  * Review existing Zap code (lib/defaults.zsh) to ensure compliance with new keybinding standards
 -->
 
 # Zap Constitution
@@ -58,37 +64,38 @@ Testing is not optional; it is the foundation of reliable software:
 
 ### III. User Experience Consistency
 
-User-facing features MUST provide consistent, predictable, and accessible experiences:
+User-facing features MUST provide consistent, predictable, and accessible experiences appropriate to the platform:
 
-- **Interface Consistency**: UI patterns, terminology, and interactions MUST be uniform across features
-- **Response Time**: User-initiated actions MUST acknowledge within 100ms; complete or show progress within 1 second
+- **Interface Consistency**: Interaction patterns, terminology, and behaviors MUST be uniform across features
+- **Response Time**: User-initiated actions MUST acknowledge promptly; provide feedback for long-running operations
 - **Error Messages**: MUST be actionable and user-friendly; explain what happened and how to resolve
-- **Accessibility**: MUST support keyboard navigation, screen readers, and color-blind safe palettes
+- **Accessibility**: MUST support platform-appropriate accessibility features (e.g., keyboard navigation for CLI, screen readers for GUI, voice control for mobile)
 - **Progressive Disclosure**: Show essential information first; provide advanced options on demand
-- **Mobile-First**: If applicable, design for mobile constraints first, then enhance for larger screens
-- **User Testing**: Major UX changes MUST be validated with real users before final release
+- **Platform Adaptation**: Design for the target platform's constraints and conventions (e.g., CLI should respect UNIX principles; GUI should follow OS design guidelines; mobile should prioritize touch interactions)
+- **Respect Standard Behaviors**: MUST NOT override platform-standard keybindings, shortcuts, or behaviors without explicit user consent; defaults should match user expectations from the platform/OS
+- **User Validation**: Major UX changes MUST be validated with real users or usability testing before final release
 
-**Rationale**: Inconsistent experiences erode trust and increase support burden. Users form mental models; violations cause frustration and errors. Accessibility is not optional.
+**Rationale**: Inconsistent experiences erode trust and increase support burden. Users form mental models based on platform conventions; violations cause frustration and errors. Overriding standard keybindings breaks muscle memory and creates hostile user experiences. Accessibility is not optional.
 
 ### IV. Performance & Scalability
 
 Performance is a feature; systems MUST be designed for efficiency and scale:
 
 - **Performance Budgets**:
-  - API endpoints: p95 latency < 200ms for reads, < 500ms for writes
-  - Page load: Time to Interactive < 3 seconds on 3G network
-  - Memory: No memory leaks; RSS growth < 10% over 24 hours under load
+  - Each project MUST define performance budgets appropriate to its domain and platform
+  - Examples: API latency targets, page load times, shell startup time, memory limits, throughput requirements
+  - Budgets MUST be measurable and enforced in testing
 - **Optimization Workflow**:
   1. Measure baseline performance with realistic data
-  2. Identify bottlenecks using profiling tools
+  2. Identify bottlenecks using profiling tools appropriate to the platform
   3. Optimize hot paths only; avoid premature optimization
   4. Re-measure to validate improvement
 - **Scalability Design**:
-  - Database queries MUST use indexes for common access patterns
-  - Avoid N+1 queries; batch or cache where appropriate
-  - Large datasets MUST use pagination or streaming
+  - Data access patterns MUST use appropriate indexing, caching, or batching strategies
+  - Avoid algorithmic inefficiencies (e.g., N+1 queries, quadratic complexity in linear use cases)
+  - Large datasets MUST use pagination, streaming, or lazy loading
   - Long operations MUST run asynchronously with status updates
-- **Monitoring**: Production systems MUST track latency, error rate, and throughput; alert on degradation
+- **Monitoring**: Production systems MUST track performance metrics appropriate to the platform; alert on degradation
 
 **Rationale**: Performance problems are difficult to fix retroactively. Slow systems frustrate users and increase infrastructure costs. Designing for scale prevents costly rewrites.
 
@@ -117,20 +124,80 @@ Documentation MUST be organized systematically to prevent repository clutter and
 
 **Rationale**: Scattered documentation creates confusion, makes information hard to find, and signals low organizational discipline. Abandoned analysis documents clutter the repository and mislead future developers. Structured organization enables knowledge discovery and maintains project clarity.
 
+### VI. Security
+
+Security MUST be designed in from the start, not bolted on later:
+
+- **Input Validation**:
+  - ALL user inputs MUST be validated and sanitized before use
+  - Reject invalid input explicitly; never attempt to "fix" malformed data
+  - Use allowlists over denylists where possible
+  - Validate data type, format, length, and range constraints
+- **Least Privilege**:
+  - Code MUST run with minimum required permissions
+  - Avoid requiring root/admin privileges unless absolutely necessary
+  - File permissions MUST follow principle of least access
+- **Secure Defaults**:
+  - Default configurations MUST be secure (e.g., encryption enabled, authentication required)
+  - Insecure options MUST require explicit opt-in with clear warnings
+  - Secrets MUST NOT be stored in code, config files, or version control
+- **Dependency Management**:
+  - Keep dependencies up to date; monitor for security advisories
+  - Pin dependency versions to prevent supply chain attacks
+  - Review dependencies for excessive permissions or suspicious behavior
+- **Vulnerability Response**:
+  - Security issues MUST be fixed with highest priority
+  - Provide clear disclosure and migration path for users
+  - Document security considerations in API documentation
+
+**Rationale**: Security vulnerabilities can have catastrophic consequences. Retrofitting security is expensive and error-prone. Defense-in-depth and secure-by-default design minimize attack surface and blast radius.
+
+### VII. Observability
+
+Systems MUST be designed for debugging, monitoring, and operational visibility:
+
+- **Logging**:
+  - Log significant events, state changes, and errors with sufficient context
+  - Use structured logging (key-value pairs) for machine parsing
+  - Include correlation IDs for distributed tracing where applicable
+  - Log levels MUST be appropriate: ERROR for failures, WARN for degraded states, INFO for significant events, DEBUG for troubleshooting
+- **Error Tracking**:
+  - Errors MUST include actionable context (what failed, why, how to fix)
+  - Error messages MUST be preserved in logs for post-mortem analysis
+  - Critical errors MUST be surfaced to monitoring/alerting systems
+- **Metrics & Monitoring**:
+  - Track key performance indicators appropriate to the domain (latency, throughput, error rate, resource usage)
+  - Expose health check endpoints or status commands
+  - Alert on anomalies, degradation, or SLA violations
+- **Debugging Support**:
+  - Provide debug modes or verbose output flags for troubleshooting
+  - Include version information in logs and error reports
+  - Preserve stack traces and diagnostic information for failures
+- **Operational Transparency**:
+  - Document expected log output and error conditions
+  - Provide runbooks or troubleshooting guides for common issues
+  - Make system state inspectable (e.g., status commands, admin dashboards)
+
+**Rationale**: You cannot fix what you cannot see. Observability enables rapid debugging, proactive monitoring, and data-driven optimization. Systems designed for visibility reduce mean time to resolution and improve reliability.
+
 ## Development Workflow
 
 ### Code Review Standards
 
 All pull requests MUST meet these criteria before approval:
 
-- Follows Core Principles (I-V)
+- Follows Core Principles (I-VII)
 - Tests pass in CI/CD pipeline
 - Code is readable and self-documenting
 - Comments explain WHY, not WHAT
 - Documentation placed in proper structured directories (no root clutter)
 - No unaddressed review comments
 - Performance implications considered for data-heavy paths
+- Security implications reviewed (input validation, permissions, secrets handling)
+- Observability included (logging, error handling, debugging support)
 - Documentation updated for user-facing changes
+
+**Note**: Detailed project-specific checklists should be maintained in `CLAUDE.md` (for AI agent guidance) or `docs/CONTRIBUTING.md` (for human contributors). The constitution establishes requirements; project files provide implementation details.
 
 ### Quality Gates
 
@@ -139,7 +206,8 @@ Before merging to main:
 - [ ] All automated tests pass
 - [ ] Code review approved by at least one peer
 - [ ] No decrease in test coverage on modified code
-- [ ] Performance tests pass (if applicable)
+- [ ] Performance budgets met (if applicable to change)
+- [ ] Security review completed (if touching auth, input handling, or sensitive data)
 - [ ] Documentation updated
 - [ ] Breaking changes communicated to stakeholders
 
@@ -153,6 +221,8 @@ A feature is complete when:
 - Documentation complete (API docs, user guides, quickstart)
 - Deployed to staging and validated by stakeholder or QA
 - Performance meets budgets defined in plan.md
+- Security review completed (if applicable)
+- Observability verified (logging, error handling, debugging support)
 - Accessibility verified (if user-facing)
 
 ## Compliance & Enforcement
@@ -188,4 +258,4 @@ When constitution conflicts with practical constraints:
 - `/speckit.plan` command enforces Constitution Check section
 - Repeated violations require process review and team training
 
-**Version**: 1.1.0 | **Ratified**: 2025-10-17 | **Last Amended**: 2025-10-17
+**Version**: 1.2.0 | **Ratified**: 2025-10-17 | **Last Amended**: 2025-10-18

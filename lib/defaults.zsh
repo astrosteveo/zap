@@ -4,56 +4,219 @@
 #
 # WHY: Provide sensible defaults so users have a working terminal immediately
 # after installation without configuration (per FR-011, FR-012, User Story 3)
+#
+# Based on Oh-My-Zsh key-bindings.zsh with Zap-specific enhancements
+
+# Reference documentation:
+# http://zsh.sourceforge.net/Doc/Release/Zsh-Line-Editor.html
+# http://zsh.sourceforge.net/Doc/Release/Zsh-Line-Editor.html#Zle-Builtins
+# http://zsh.sourceforge.net/Doc/Release/Zsh-Line-Editor.html#Standard-Widgets
 
 #
-# Default Keybindings (FR-011)
+# Terminal Application Mode
 #
-# WHY: Standard terminal keys should work out of the box. Many terminal emulators
-# don't bind these by default, causing frustration (User Story 3 acceptance criteria)
+# WHY: Some terminals require application mode for special keys to work.
+# This ensures terminfo values are valid when ZLE (Zsh Line Editor) is active.
 #
-
-# Make sure the terminal is in application mode when zle is active
-# WHY: Some terminals require application mode for special keys to work
-if (( ${+terminfo[smkx]} && ${+terminfo[rmkx]} )); then
-  autoload -Uz add-zle-hook-widget
-  function zle_application_mode_start { echoti smkx }
-  function zle_application_mode_stop { echoti rmkx }
-  add-zle-hook-widget -Uz zle-line-init zle_application_mode_start
-  add-zle-hook-widget -Uz zle-line-finish zle_application_mode_stop
+if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
+  function zle-line-init() {
+    echoti smkx
+  }
+  function zle-line-finish() {
+    echoti rmkx
+  }
+  zle -N zle-line-init
+  zle -N zle-line-finish
 fi
 
-# Delete key - delete character under cursor
-# WHY: Delete key not working is a common complaint
-[[ -n "${terminfo[kdch1]}" ]] && bindkey "${terminfo[kdch1]}" delete-char
-bindkey "^[[3~" delete-char  # Fallback for terminals without terminfo
+#
+# Keymap Mode Selection
+#
+# WHY: Default to emacs mode for consistency with most shells (bash, zsh default).
+# Users who want vi mode should set `bindkey -v` BEFORE sourcing zap.
+# This ensures vi mode users don't get their preference overridden.
+#
+bindkey -e  # Use emacs key bindings by default
 
-# Home key - move to beginning of line
-# WHY: Critical for command editing efficiency
-[[ -n "${terminfo[khome]}" ]] && bindkey "${terminfo[khome]}" beginning-of-line
-bindkey "^[[H" beginning-of-line  # Fallback
-bindkey "^[[1~" beginning-of-line # Alternative fallback
+# Enable Ctrl-S for forward incremental search
+# WHY: By default, Ctrl-S is captured by terminal flow control (XOFF). Disabling
+# flow control allows Ctrl-S to work as forward-i-search, matching user expectations.
+stty -ixon 2>/dev/null
 
-# End key - move to end of line
-[[ -n "${terminfo[kend]}" ]] && bindkey "${terminfo[kend]}" end-of-line
-bindkey "^[[F" end-of-line  # Fallback
-bindkey "^[[4~" end-of-line # Alternative fallback
+#
+# Smart History Search (Fuzzy Find)
+#
+# WHY: Much better UX than plain history navigation. If you type "git" and press
+# Up arrow, you only see commands starting with "git" instead of all history.
+# This is one of Oh-My-Zsh's most popular features.
+#
+autoload -U up-line-or-beginning-search
+autoload -U down-line-or-beginning-search
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
 
-# Page Up - search backward in history
-# WHY: Common pattern for history navigation
-[[ -n "${terminfo[kpp]}" ]] && bindkey "${terminfo[kpp]}" up-line-or-history
-bindkey "^[[5~" up-line-or-history  # Fallback
+#
+# Navigation Keybindings
+#
+# WHY: These keys work across all three keymaps (emacs, viins, vicmd) to ensure
+# consistent behavior whether user is in emacs mode or vi mode. This matches
+# Oh-My-Zsh's approach of explicitly binding to all three maps.
+#
 
-# Page Down - search forward in history
-[[ -n "${terminfo[knp]}" ]] && bindkey "${terminfo[knp]}" down-line-or-history
-bindkey "^[[6~" down-line-or-history  # Fallback
+# [Up-Arrow] - Smart history search backward (filters by what you've typed)
+if [[ -n "${terminfo[kcuu1]}" ]]; then
+  bindkey -M emacs "${terminfo[kcuu1]}" up-line-or-beginning-search
+  bindkey -M viins "${terminfo[kcuu1]}" up-line-or-beginning-search
+  bindkey -M vicmd "${terminfo[kcuu1]}" up-line-or-beginning-search
+fi
+bindkey -M emacs "^[[A" up-line-or-beginning-search
+bindkey -M viins "^[[A" up-line-or-beginning-search
+bindkey -M vicmd "^[[A" up-line-or-beginning-search
 
-# Up arrow - previous command in history
-[[ -n "${terminfo[kcuu1]}" ]] && bindkey "${terminfo[kcuu1]}" up-line-or-history
-bindkey "^[[A" up-line-or-history
+# [Down-Arrow] - Smart history search forward
+if [[ -n "${terminfo[kcud1]}" ]]; then
+  bindkey -M emacs "${terminfo[kcud1]}" down-line-or-beginning-search
+  bindkey -M viins "${terminfo[kcud1]}" down-line-or-beginning-search
+  bindkey -M vicmd "${terminfo[kcud1]}" down-line-or-beginning-search
+fi
+bindkey -M emacs "^[[B" down-line-or-beginning-search
+bindkey -M viins "^[[B" down-line-or-beginning-search
+bindkey -M vicmd "^[[B" down-line-or-beginning-search
 
-# Down arrow - next command in history
-[[ -n "${terminfo[kcud1]}" ]] && bindkey "${terminfo[kcud1]}" down-line-or-history
-bindkey "^[[B" down-line-or-history
+# [PageUp] - Move up in history
+if [[ -n "${terminfo[kpp]}" ]]; then
+  bindkey -M emacs "${terminfo[kpp]}" up-line-or-history
+  bindkey -M viins "${terminfo[kpp]}" up-line-or-history
+  bindkey -M vicmd "${terminfo[kpp]}" up-line-or-history
+fi
+bindkey -M emacs "^[[5~" up-line-or-history
+bindkey -M viins "^[[5~" up-line-or-history
+bindkey -M vicmd "^[[5~" up-line-or-history
+
+# [PageDown] - Move down in history
+if [[ -n "${terminfo[knp]}" ]]; then
+  bindkey -M emacs "${terminfo[knp]}" down-line-or-history
+  bindkey -M viins "${terminfo[knp]}" down-line-or-history
+  bindkey -M vicmd "${terminfo[knp]}" down-line-or-history
+fi
+bindkey -M emacs "^[[6~" down-line-or-history
+bindkey -M viins "^[[6~" down-line-or-history
+bindkey -M vicmd "^[[6~" down-line-or-history
+
+# [Home] - Go to beginning of line
+if [[ -n "${terminfo[khome]}" ]]; then
+  bindkey -M emacs "${terminfo[khome]}" beginning-of-line
+  bindkey -M viins "${terminfo[khome]}" beginning-of-line
+  bindkey -M vicmd "${terminfo[khome]}" beginning-of-line
+fi
+bindkey -M emacs "^[[H" beginning-of-line
+bindkey -M viins "^[[H" beginning-of-line
+bindkey -M vicmd "^[[H" beginning-of-line
+bindkey -M emacs "^[[1~" beginning-of-line
+bindkey -M viins "^[[1~" beginning-of-line
+bindkey -M vicmd "^[[1~" beginning-of-line
+
+# [End] - Go to end of line
+if [[ -n "${terminfo[kend]}" ]]; then
+  bindkey -M emacs "${terminfo[kend]}" end-of-line
+  bindkey -M viins "${terminfo[kend]}" end-of-line
+  bindkey -M vicmd "${terminfo[kend]}" end-of-line
+fi
+bindkey -M emacs "^[[F" end-of-line
+bindkey -M viins "^[[F" end-of-line
+bindkey -M vicmd "^[[F" end-of-line
+bindkey -M emacs "^[[4~" end-of-line
+bindkey -M viins "^[[4~" end-of-line
+bindkey -M vicmd "^[[4~" end-of-line
+
+#
+# Editing Keybindings
+#
+
+# [Backspace] - Delete backward
+bindkey -M emacs '^?' backward-delete-char
+bindkey -M viins '^?' backward-delete-char
+bindkey -M vicmd '^?' backward-delete-char
+
+# [Delete] - Delete forward
+if [[ -n "${terminfo[kdch1]}" ]]; then
+  bindkey -M emacs "${terminfo[kdch1]}" delete-char
+  bindkey -M viins "${terminfo[kdch1]}" delete-char
+  bindkey -M vicmd "${terminfo[kdch1]}" delete-char
+else
+  bindkey -M emacs "^[[3~" delete-char
+  bindkey -M viins "^[[3~" delete-char
+  bindkey -M vicmd "^[[3~" delete-char
+fi
+
+# [Ctrl-Delete] - Delete whole forward word
+# WHY: Matches GUI application behavior for power users
+bindkey -M emacs '^[[3;5~' kill-word
+bindkey -M viins '^[[3;5~' kill-word
+bindkey -M vicmd '^[[3;5~' kill-word
+
+# [Ctrl-RightArrow] - Move forward one word
+# WHY: Common in GUI applications; complements Alt-F
+bindkey -M emacs '^[[1;5C' forward-word
+bindkey -M viins '^[[1;5C' forward-word
+bindkey -M vicmd '^[[1;5C' forward-word
+
+# [Ctrl-LeftArrow] - Move backward one word
+# WHY: Common in GUI applications; complements Alt-B
+bindkey -M emacs '^[[1;5D' backward-word
+bindkey -M viins '^[[1;5D' backward-word
+bindkey -M vicmd '^[[1;5D' backward-word
+
+# [Ctrl-r] - Search backward incrementally in history
+# WHY: This is muscle memory for most terminal users
+bindkey '^r' history-incremental-search-backward
+
+# [Space] - Don't do history expansion
+# WHY: Prevents surprises when typing commands with "!" in them
+bindkey ' ' magic-space
+
+#
+# Advanced Editing Features
+#
+
+# [Ctrl-x Ctrl-e] - Edit command line in $EDITOR
+# WHY: Essential for editing complex commands (multi-line, long pipelines)
+autoload -U edit-command-line
+zle -N edit-command-line
+bindkey '\C-x\C-e' edit-command-line
+
+# [Alt-m] - Copy previous shell word
+# WHY: Useful for repeating arguments from previous command
+bindkey "^[m" copy-prev-shell-word
+
+# [Alt-w] - Kill from cursor to mark
+# WHY: Part of standard emacs editing keybindings
+bindkey '\ew' kill-region
+
+#
+# Completion Keybindings
+#
+
+# [Shift-Tab] - Move through completion menu backwards
+# WHY: Complements Tab for bidirectional menu navigation
+if [[ -n "${terminfo[kcbt]}" ]]; then
+  bindkey -M emacs "${terminfo[kcbt]}" reverse-menu-complete
+  bindkey -M viins "${terminfo[kcbt]}" reverse-menu-complete
+  bindkey -M vicmd "${terminfo[kcbt]}" reverse-menu-complete
+fi
+
+#
+# IMPORTANT NOTES (per Constitution Principle III: Respect Standard Behaviors)
+#
+# The following keybindings are NEVER overridden:
+# - Ctrl-D: EOF (exit shell when line is empty)
+# - Ctrl-C: SIGINT (interrupt current command)
+# - Ctrl-Z: SIGTSTP (suspend current process)
+# - Ctrl-L: Clear screen (standard across all terminals)
+#
+# These are handled by the terminal and shell core, not by ZLE keybindings.
+# Attempting to rebind them breaks user expectations and creates frustration.
+#
 
 #
 # Minimal Completion System (FR-022)
@@ -97,31 +260,73 @@ zstyle ':completion:*' cache-path "$ZAP_DATA_DIR/.zcompcache"
 # WHY: Visual distinction helps identify file types
 zstyle ':completion:*' list-colors ''
 
-# History-based completion
-# WHY: Leverage shell history for smarter suggestions (FR-022 requirement)
-setopt HIST_IGNORE_ALL_DUPS  # Don't record duplicate commands
-setopt HIST_FIND_NO_DUPS     # Don't display duplicates when searching
-setopt HIST_IGNORE_SPACE     # Don't record commands starting with space
+# History configuration (based on Oh-My-Zsh history.zsh)
+# WHY: Robust history settings improve command recall and productivity
 
 # Set history file and size
-HISTFILE="$ZAP_DATA_DIR/.zsh_history"
-HISTSIZE=10000
-SAVEHIST=10000
+# WHY: Default location if not set; increase size to 50k (Oh-My-Zsh standard)
+[ -z "$HISTFILE" ] && HISTFILE="$ZAP_DATA_DIR/.zsh_history"
+[ "$HISTSIZE" -lt 50000 ] && HISTSIZE=50000
+[ "$SAVEHIST" -lt 10000 ] && SAVEHIST=10000
+
+# History behavior options
+setopt EXTENDED_HISTORY       # Record timestamp of command in HISTFILE
+setopt HIST_EXPIRE_DUPS_FIRST # Delete duplicates first when HISTFILE size exceeds HISTSIZE
+setopt HIST_IGNORE_DUPS       # Don't record duplicate consecutive commands
+setopt HIST_IGNORE_SPACE      # Don't record commands starting with space
+setopt HIST_VERIFY            # Show command with history expansion (!!) before running it
+setopt HIST_FIND_NO_DUPS      # Don't display duplicates when searching
+
+# Share history across sessions (opt-in via ZAP_SHARE_HISTORY=true)
+# WHY: Some users love it (instant history sync), others hate it (per-session isolation).
+# Default to off for predictable behavior, opt-in for power users.
+if [[ "$ZAP_SHARE_HISTORY" == true ]]; then
+  setopt SHARE_HISTORY        # Share command history data across all sessions
+fi
 
 #
-# Additional Quality-of-Life Settings
+# Additional Quality-of-Life Settings (based on Oh-My-Zsh misc.zsh and directories.zsh)
 #
 # WHY: These settings improve shell usability without changing behavior significantly
 #
 
-# Don't beep on errors
-setopt NO_BEEP
+# Basic shell behavior
+setopt NO_BEEP                # Don't beep on errors
+setopt INTERACTIVE_COMMENTS   # Allow comments in interactive shell
+setopt AUTO_CD                # cd without typing cd
+setopt CORRECT                # Correct minor typos in commands
 
-# Allow comments in interactive shell
-setopt INTERACTIVE_COMMENTS
+# Directory navigation (from Oh-My-Zsh directories.zsh)
+setopt AUTO_PUSHD             # Automatically push directories onto stack
+setopt PUSHD_IGNORE_DUPS      # Don't duplicate directories in stack
+setopt PUSHDMINUS             # Swap meaning of cd +1 and cd -1
 
-# cd without typing cd
-setopt AUTO_CD
+# Directory aliases for quick navigation
+# WHY: Typing ../../.. is tedious; these are muscle memory for many users
+alias -g ...='../..'
+alias -g ....='../../..'
+alias -g .....='../../../..'
+alias -g ......='../../../../..'
+alias -- -='cd -'             # Quick switch to previous directory
 
-# Correct minor typos in commands
-setopt CORRECT
+# Advanced features (from Oh-My-Zsh misc.zsh)
+setopt MULTIOS                # Enable redirect to multiple streams: echo >file1 >file2
+setopt LONG_LIST_JOBS         # Show long list format job notifications
+
+# Bracketed paste mode - SECURITY FEATURE
+# WHY: Prevents accidental execution when pasting commands (e.g., curl|sh exploits).
+# Text pasted with bracketed paste is treated as literal, not as keystrokes.
+autoload -Uz is-at-least
+if [[ $DISABLE_MAGIC_FUNCTIONS != true ]]; then
+  for d in $fpath; do
+    if [[ -e "$d/url-quote-magic" ]]; then
+      if is-at-least 5.1; then
+        autoload -Uz bracketed-paste-magic
+        zle -N bracketed-paste bracketed-paste-magic
+      fi
+      autoload -Uz url-quote-magic
+      zle -N self-insert url-quote-magic
+      break
+    fi
+  done
+fi

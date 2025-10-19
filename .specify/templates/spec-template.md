@@ -147,3 +147,19 @@
 - **Review**: All code changes require peer review before merging
 - **Maintainability**: Code must follow single responsibility principle; complexity must be justified
 
+### Security Requirements
+
+- **Input Validation**: [Specify validation strategy for user inputs, e.g., allowlists, format constraints, sanitization]
+- **Permissions**: [Specify privilege requirements, e.g., runs as unprivileged user, file permissions]
+- **Secure Defaults**: [Describe default configuration security posture]
+- **Secrets Management**: [How secrets/credentials are handled if applicable, or N/A]
+- **Dependencies**: [Security update strategy for dependencies if applicable, or N/A]
+
+### Observability Requirements
+
+- **Logging**: [Specify what events should be logged, log levels, structured logging requirements]
+- **Error Tracking**: [How errors should be captured and reported for debugging]
+- **Monitoring**: [What metrics should be tracked if applicable, or N/A for simple tools]
+- **Debugging Support**: [Debug modes, verbose flags, diagnostic output requirements]
+- **Operational Transparency**: [Status commands, health checks, inspection capabilities if applicable]
+

@@ -6,10 +6,12 @@ A modern, minimal Zsh plugin manager designed for speed and simplicity.
 
 - **Simple Configuration**: Intuitive syntax for plugin specifications
 - **Fast Startup**: Sub-second shell initialization with 10+ plugins
+- **Oh-My-Zsh Experience**: Smart history search, sensible keybindings, terminal titles
 - **Version Pinning**: Lock plugins to specific versions, tags, or commits
 - **Framework Compatible**: Works seamlessly with Oh-My-Zsh and Prezto plugins
-- **Sensible Defaults**: Working keybindings and completions out of the box
+- **Built-in Prompt**: Clean, fast prompt out of the box (or use Starship for more features)
 - **Graceful Degradation**: Plugin failures never block shell startup
+- **Security First**: Completion security checks, bracketed paste protection
 
 ## Quick Start
 
