@@ -21,6 +21,13 @@ export ZAP_VERSION="1.0.0"
 # Create data directories if they don't exist
 mkdir -p "$ZAP_PLUGIN_DIR" 2>/dev/null
 
+# Load user configuration (optional)
+# WHY: Users can customize zap behavior via zstyle settings in ~/.zaprc
+# This must be loaded early so settings affect library initialization
+if [[ -f "${ZDOTDIR:-$HOME}/.zaprc" ]]; then
+  source "${ZDOTDIR:-$HOME}/.zaprc"
+fi
+
 # Check Zsh version (FR-032: warn if < 5.0)
 # WHY: Zap requires Zsh 5.0+ for certain features; warn user but continue
 if [[ "${ZSH_VERSION%%.*}" -lt 5 ]]; then
@@ -56,6 +63,10 @@ source "$ZAP_DIR/lib/termsupport.zsh"
 if [[ "$ZAP_DISABLE_PROMPT" != true ]]; then
   source "$ZAP_DIR/lib/prompt.zsh"
 fi
+
+# Source version manager support (nvm, rbenv, pyenv)
+# WHY: Auto-detect and lazy-load common version managers for zero-config experience
+source "$ZAP_DIR/lib/nvm.zsh"
 
 #
 # zap - Main command dispatcher

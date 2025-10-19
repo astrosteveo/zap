@@ -248,6 +248,62 @@ romkatv/powerlevel10k@v1.16.1
 
 Both approaches work identically.
 
+### Advanced Configuration with zstyle
+
+Zap uses Zsh's `zstyle` system for configuration, providing a clean and powerful way to customize behavior.
+
+**Creating a configuration file:**
+
+The installer can optionally create `~/.zaprc` with example configurations:
+
+```bash
+cp ~/.zap/config/zaprc.template ~/.zaprc
+```
+
+Then edit `~/.zaprc` to customize. All settings are commented by default.
+
+**Common configurations:**
+
+```zsh
+# ~/.zaprc
+
+# Node.js version manager (auto-detected, lazy-loaded by default)
+zstyle ':zap:nvm' enable 'yes'        # Force enable
+zstyle ':zap:nvm' lazy-load 'no'      # Immediate load (slower startup)
+
+# Disable built-in prompt (use Starship instead)
+zstyle ':zap:prompt' enable 'no'
+
+# Customize history size
+zstyle ':zap:history' size '100000'
+
+# Disable auto-pushd
+zstyle ':zap:directories' auto-pushd 'no'
+
+# Use vi mode for keybindings
+zstyle ':zap:keybindings' mode 'vi'
+```
+
+**Version managers supported:**
+- **nvm** (Node.js) - Auto-detected if `~/.nvm` exists
+- **rbenv** (Ruby) - Auto-detected if `~/.rbenv` exists
+- **pyenv** (Python) - Auto-detected if `~/.pyenv` exists
+
+All version managers use lazy-loading by default for fast startup.
+
+**Viewing active configuration:**
+
+```zsh
+# Show all zap zstyles
+zstyle -L ':zap:*'
+```
+
+**Configuration precedence:**
+1. `~/.zaprc` (if it exists) - user customization
+2. Built-in defaults - sensible out-of-the-box behavior
+
+For a complete list of configuration options, see `~/.zap/config/zaprc.template`.
+
 ## Default Features
 
 Zap provides sensible defaults out of the box, even with zero plugins:

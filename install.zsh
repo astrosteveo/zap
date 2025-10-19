@@ -204,6 +204,28 @@ EOF
   print_success "Updated $ZSHRC"
 fi
 
+# Optionally create ~/.zaprc configuration file
+ZAPRC="${ZDOTDIR:-$HOME}/.zaprc"
+
+if [[ ! -f "$ZAPRC" ]]; then
+  # Only prompt if interactive
+  if [[ -t 0 ]]; then
+    echo ""
+    print_info "Zap can be customized via zstyle settings in ~/.zaprc"
+    read "REPLY?Create ~/.zaprc with example configurations? [Y/n] "
+    REPLY="${REPLY:-y}"
+
+    if [[ "$REPLY" =~ ^[Yy]$ ]]; then
+      cp "$ZAP_INSTALL_DIR/config/zaprc.template" "$ZAPRC"
+      print_success "Created $ZAPRC"
+      print_info "Edit $ZAPRC to customize Zap behavior"
+    fi
+  else
+    # Non-interactive: skip zaprc creation
+    print_info "Skipping ~/.zaprc creation (run 'cp ~/.zap/config/zaprc.template ~/.zaprc' to create later)"
+  fi
+fi
+
 # Installation complete
 echo ""
 print_success "Installation complete!"
