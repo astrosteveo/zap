@@ -16,6 +16,7 @@ export ZAP_DIR="${0:A:h}"
 export ZAP_DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/zap"
 export ZAP_PLUGIN_DIR="$ZAP_DATA_DIR/plugins"
 export ZAP_ERROR_LOG="$ZAP_DATA_DIR/errors.log"
+export ZAP_STATE_LOG="$ZAP_DATA_DIR/state.log"
 export ZAP_VERSION="1.0.0"
 
 # Create data directories if they don't exist
@@ -50,6 +51,16 @@ source "$ZAP_DIR/lib/downloader.zsh"
 source "$ZAP_DIR/lib/loader.zsh"
 source "$ZAP_DIR/lib/updater.zsh"
 source "$ZAP_DIR/lib/framework.zsh"
+source "$ZAP_DIR/lib/state.zsh"
+source "$ZAP_DIR/lib/declarative.zsh"
+
+# Auto-load plugins declared in plugins=() array (User Story 1)
+# WHY: Declarative plugin management allows users to declare desired state
+# in their .zshrc and have Zap automatically load all plugins on startup.
+# This eliminates repetitive imperative zap load commands.
+if [[ -n "${ZDOTDIR:-$HOME}/.zshrc" ]]; then
+  _zap_load_declared_plugins "${ZDOTDIR:-$HOME}/.zshrc" 2>/dev/null || true
+fi
 
 # Source defaults (sensible keybindings and completions)
 source "$ZAP_DIR/lib/defaults.zsh"
@@ -108,6 +119,10 @@ zap() {
       ;;
     uninstall)
       _zap_cmd_uninstall "$@"
+      ;;
+    # Declarative plugin management commands (Feature 002)
+    try|sync|status|diff|adopt)
+      _zap_declarative_dispatch "$subcommand" "$@"
       ;;
     help|--help|-h)
       _zap_cmd_help "$@"
@@ -852,4 +867,12 @@ else
   # Insecure - completions disabled, warning already shown
   # WHY: Don't load completions from insecure directories (security risk)
   :
+fi
+
+# Source user local overrides (after ALL plugins and Zap defaults loaded)
+# WHY: Provides a clean separation for user customizations (aliases, functions, etc.)
+# that need to run after plugins. Prevents clutter in main .zshrc.
+# Tools that auto-add to config (starship, mise, fzf) should add to .zshrc.local
+if [[ -f "${ZDOTDIR:-$HOME}/.zshrc.local" ]]; then
+  source "${ZDOTDIR:-$HOME}/.zshrc.local"
 fi

@@ -40,6 +40,7 @@ Verify compliance with `.specify/memory/constitution.md`:
 - [ ] **Documentation**: Docs organized in structured directories (specs/, docs/); no random .md files in root
 - [ ] **Security**: Input validation strategy defined; least privilege principle applied; secure defaults ensured
 - [ ] **Observability**: Logging, error tracking, and debugging support planned; appropriate to platform
+- [ ] **Declarative Configuration**: If introducing configuration, follows declarative patterns; provides reconciliation; no hidden state
 - [ ] **Quality Gates**: Definition of Done criteria established; code review process defined
 
 *If any gate fails, document justification in Complexity Tracking section below.*

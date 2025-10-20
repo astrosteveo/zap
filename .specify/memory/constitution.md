@@ -1,24 +1,20 @@
 <!--
 Sync Impact Report:
-- Version change: 1.1.0 → 1.2.0
-- Modified principles:
-  * III. User Experience Consistency (GENERALIZED: Removed web/mobile-specific requirements; now platform-agnostic)
-    - ADDED: "Respect Standard Behaviors" requirement (keybindings, shortcuts, platform conventions)
-  * IV. Performance & Scalability (GENERALIZED: Removed hard-coded numeric targets; now domain-agnostic with requirement to define budgets)
+- Version change: 1.2.0 → 1.3.0
+- Modified principles: None
 - Added sections:
-  * VI. Security (NEW PRINCIPLE: Input validation, least privilege, secure defaults, vulnerability response)
-  * VII. Observability (NEW PRINCIPLE: Logging, monitoring, debugging, error tracking)
+  * VIII. Declarative Configuration (NEW PRINCIPLE: Declarative state management, immutable infrastructure pattern, reconciliation)
 - Removed sections: None
-- Reorganized sections:
-  * Development Workflow (SIMPLIFIED: Detailed checklists moved to project-specific CLAUDE.md; constitution retains high-level process requirements)
 - Templates requiring updates:
-  ✅ spec-template.md (UPDATED: Added Security and Observability requirement sections)
-  ✅ plan-template.md (UPDATED: Constitution Check now includes all 7 principles)
-  ✅ tasks-template.md (NO CHANGE NEEDED: TDD workflow remains unchanged)
-  ✅ CLAUDE.md (UPDATED: Added Zsh-specific UX standards, Default Keybindings, Security practices, Observability examples)
+  ✅ plan-template.md (UPDATED: Constitution Check now includes VIII. Declarative Configuration)
+  ✅ spec-template.md (UPDATED: Added Declarative Configuration Requirements section)
+  ⚠ CLAUDE.md (PENDING: Add declarative config examples and patterns)
 - Follow-up TODOs:
-  * Consider creating docs/CONTRIBUTING.md with detailed development workflow for human contributors
-  * Review existing Zap code (lib/defaults.zsh) to ensure compliance with new keybinding standards
+  * Update CLAUDE.md with declarative configuration patterns and examples
+  * Review Zap implementation to align with declarative paradigm
+  * Update quickstart.md with declarative-first approach (plugins array)
+  * Document reconciliation commands (sync, try, adopt, status, diff) in user guide
+  * Implement state tracking to distinguish declared vs. experimental plugins
 -->
 
 # Zap Constitution
@@ -180,13 +176,57 @@ Systems MUST be designed for debugging, monitoring, and operational visibility:
 
 **Rationale**: You cannot fix what you cannot see. Observability enables rapid debugging, proactive monitoring, and data-driven optimization. Systems designed for visibility reduce mean time to resolution and improve reliability.
 
+### VIII. Declarative Configuration
+
+Configuration MUST follow declarative patterns inspired by immutable infrastructure principles (NixOS, Docker Compose, Kubernetes):
+
+- **Declarative State Management**:
+  - Configuration files MUST represent the desired end state, not a sequence of operations
+  - Users declare WHAT they want, not HOW to achieve it
+  - State MUST be reproducible from configuration alone (no hidden state)
+  - Configuration MUST be version-controllable and portable across environments
+- **Separation of Concerns**:
+  - **Declared state**: Configuration files define permanent, intended state
+  - **Experimental state**: Temporary modifications clearly distinguished from declared state
+  - **Reconciliation**: Explicit commands to return system to declared state
+- **Reconciliation Model**:
+  - Provide a reconciliation command (e.g., `sync`, `apply`, `rebuild`) that:
+    - Reads declared configuration
+    - Compares to current runtime state
+    - Makes minimal changes to achieve declared state
+    - Is idempotent (safe to run multiple times)
+  - Users MUST be able to return to declared state at any time
+- **Experimentation Support**:
+  - Allow temporary modifications for testing/development
+  - Clearly mark experimental state as ephemeral
+  - Provide commands to promote experiments to declared state
+  - Reconciliation MUST remove experimental state unless explicitly adopted
+- **State Transparency**:
+  - Provide commands to show current state vs. declared state (drift detection)
+  - Show what reconciliation would change before applying
+  - Track whether components are from declared config or experimental additions
+- **No Hidden State**:
+  - Avoid imperative commands that modify state without updating config
+  - If imperative commands exist, they MUST either:
+    - Update the configuration file automatically, OR
+    - Be clearly marked as temporary/experimental
+  - System behavior MUST be fully determined by configuration files
+
+**Rationale**: Declarative configuration enables reproducibility, portability, and fearless experimentation. The NixOS/Docker/Kubernetes model has proven that separating declared intent from runtime state reduces configuration drift, simplifies multi-machine management, and enables rollback/recovery. Users can experiment freely knowing they can always return to a known-good state. This pattern transforms configuration from error-prone imperative scripts into reliable infrastructure-as-code.
+
+**Examples**:
+- **Good**: `plugins=('foo' 'bar')` in config, `zap sync` applies it
+- **Good**: `zap try baz` (experimental), `zap sync` removes it, `zap adopt baz` makes it permanent
+- **Bad**: `zap load foo` with no config file involvement (hidden state)
+- **Bad**: Imperative commands that cannot be reconciled back to config
+
 ## Development Workflow
 
 ### Code Review Standards
 
 All pull requests MUST meet these criteria before approval:
 
-- Follows Core Principles (I-VII)
+- Follows Core Principles (I-VIII)
 - Tests pass in CI/CD pipeline
 - Code is readable and self-documenting
 - Comments explain WHY, not WHAT
@@ -195,6 +235,7 @@ All pull requests MUST meet these criteria before approval:
 - Performance implications considered for data-heavy paths
 - Security implications reviewed (input validation, permissions, secrets handling)
 - Observability included (logging, error handling, debugging support)
+- Declarative configuration patterns followed (if applicable to feature)
 - Documentation updated for user-facing changes
 
 **Note**: Detailed project-specific checklists should be maintained in `CLAUDE.md` (for AI agent guidance) or `docs/CONTRIBUTING.md` (for human contributors). The constitution establishes requirements; project files provide implementation details.
@@ -210,6 +251,7 @@ Before merging to main:
 - [ ] Security review completed (if touching auth, input handling, or sensitive data)
 - [ ] Documentation updated
 - [ ] Breaking changes communicated to stakeholders
+- [ ] Declarative configuration maintained (no hidden state introduced)
 
 ### Definition of Done
 
@@ -224,6 +266,7 @@ A feature is complete when:
 - Security review completed (if applicable)
 - Observability verified (logging, error handling, debugging support)
 - Accessibility verified (if user-facing)
+- Declarative configuration documented (if configuration changes introduced)
 
 ## Compliance & Enforcement
 
@@ -258,4 +301,4 @@ When constitution conflicts with practical constraints:
 - `/speckit.plan` command enforces Constitution Check section
 - Repeated violations require process review and team training
 
-**Version**: 1.2.0 | **Ratified**: 2025-10-17 | **Last Amended**: 2025-10-18
+**Version**: 1.3.0 | **Ratified**: 2025-10-17 | **Last Amended**: 2025-10-18

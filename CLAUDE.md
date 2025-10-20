@@ -500,18 +500,13 @@ fi
 - **Version pinning**: Respect @version, @commit, @branch pins
 
 ## Recent Changes
+- 002-specify-scripts-bash: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
 
 ### 2025-10-18
 - ✅ **Phase 9 Complete**: CLI commands (zap clean, doctor, uninstall)
 - ✅ **Phase 10 Complete**: Zsh version detection, plugin manager conflict warnings
-- ✅ **Phase 11 Complete**: Comprehensive README, migration guides, troubleshooting
-- ✅ **Test Coverage**: 119+ test cases across contract, integration, and unit tests
-- ✅ **Analysis**: Pre-release requirements audit (172-item checklist)
 
 ### 2025-10-17
-- ✅ **Phases 1-8 Complete**: Core implementation, error handling, performance optimization
-- ✅ **Implementation**: All 7 lib modules, zap.zsh entry point, install.zsh
-- ✅ **Testing**: Contract tests for all user stories, performance benchmarks
 
 ## Development Workflow
 

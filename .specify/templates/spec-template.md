@@ -163,3 +163,12 @@
 - **Debugging Support**: [Debug modes, verbose flags, diagnostic output requirements]
 - **Operational Transparency**: [Status commands, health checks, inspection capabilities if applicable]
 
+### Declarative Configuration Requirements
+
+- **Configuration Model**: [If feature introduces configuration, specify declarative approach: config files represent desired state, not operations]
+- **Reconciliation**: [How users return to declared state, e.g., sync command, apply command]
+- **Experimentation**: [How temporary changes are distinguished from permanent configuration]
+- **State Transparency**: [How users inspect current vs. declared state, drift detection]
+- **No Hidden State**: [Ensure all system behavior is determined by config files, no imperative-only mutations]
+- **N/A**: [If feature doesn't involve user configuration, mark as N/A]
+
