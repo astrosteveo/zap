@@ -13,7 +13,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-00ff00.svg)](https://opensource.org/licenses/MIT)
 [![Zsh](https://img.shields.io/badge/Zsh-5.0+-1f425f.svg)](https://www.zsh.org/)
-[![Status](https://img.shields.io/badge/status-production-00ff00)](https://github.com/zap-zsh/zap)
+[![Status](https://img.shields.io/badge/status-production-00ff00)](https://github.com/astrosteveo/zap)
 
 ---
 
@@ -36,13 +36,13 @@ Inspired by **NixOS** (declarative), **Docker** (ephemeral), and the **Church of
 ### Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/zap-zsh/zap/master/install.zsh | zsh
+curl -fsSL https://raw.githubusercontent.com/astrosteveo/zap/master/install.zsh | zsh
 ```
 
 Or if you don't trust pipe-to-shell (you shouldn't):
 
 ```bash
-git clone https://github.com/zap-zsh/zap.git ~/.zap
+git clone https://github.com/astrosteveo/zap.git ~/.zap
 echo "source ~/.zap/zap.zsh" >> ~/.zshrc
 ```
 
@@ -443,7 +443,7 @@ PRs welcome. Keep it:
 
 ```bash
 # Clone
-git clone https://github.com/zap-zsh/zap.git
+git clone https://github.com/astrosteveo/zap.git
 cd zap
 
 # Test
@@ -480,9 +480,9 @@ Built with:
 
 ## 🔗 Links
 
-- **Docs**: [Wiki](https://github.com/zap-zsh/zap/wiki)
-- **Issues**: [GitHub Issues](https://github.com/zap-zsh/zap/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/zap-zsh/zap/discussions)
+- **Docs**: [Wiki](https://github.com/astrosteveo/zap/wiki)
+- **Issues**: [GitHub Issues](https://github.com/astrosteveo/zap/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/astrosteveo/zap/discussions)
 
 ---
 
