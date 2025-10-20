@@ -262,3 +262,81 @@ _zap_print_downloading() {
     echo "⬇ Downloading $plugin..."
   fi
 }
+
+#
+# _zap_format_time_ago - Format timestamp as human-readable "time ago"
+#
+# Purpose: Convert epoch timestamp to relative time for display in zap status
+# Parameters:
+#   $1 - Epoch timestamp (seconds since 1970-01-01)
+# Returns: 0 always
+# Output: Human-readable time string (e.g., "5 minutes ago", "2 hours ago")
+#
+# WHY: User Story 5 requires displaying when plugins were loaded with
+# human-friendly relative timestamps for better UX
+#
+_zap_format_time_ago() {
+  local timestamp="$1"
+  local now=$(date +%s)
+  local diff=$((now - timestamp))
+
+  # Handle negative or zero differences
+  if [[ $diff -le 0 ]]; then
+    echo "just now"
+    return 0
+  fi
+
+  # Calculate time units
+  local seconds=$diff
+  local minutes=$((seconds / 60))
+  local hours=$((minutes / 60))
+  local days=$((hours / 24))
+  local weeks=$((days / 7))
+  local months=$((days / 30))
+  local years=$((days / 365))
+
+  # Format based on largest relevant unit
+  if [[ $years -gt 0 ]]; then
+    if [[ $years -eq 1 ]]; then
+      echo "1 year ago"
+    else
+      echo "$years years ago"
+    fi
+  elif [[ $months -gt 0 ]]; then
+    if [[ $months -eq 1 ]]; then
+      echo "1 month ago"
+    else
+      echo "$months months ago"
+    fi
+  elif [[ $weeks -gt 0 ]]; then
+    if [[ $weeks -eq 1 ]]; then
+      echo "1 week ago"
+    else
+      echo "$weeks weeks ago"
+    fi
+  elif [[ $days -gt 0 ]]; then
+    if [[ $days -eq 1 ]]; then
+      echo "1 day ago"
+    else
+      echo "$days days ago"
+    fi
+  elif [[ $hours -gt 0 ]]; then
+    if [[ $hours -eq 1 ]]; then
+      echo "1 hour ago"
+    else
+      echo "$hours hours ago"
+    fi
+  elif [[ $minutes -gt 0 ]]; then
+    if [[ $minutes -eq 1 ]]; then
+      echo "1 minute ago"
+    else
+      echo "$minutes minutes ago"
+    fi
+  else
+    if [[ $seconds -eq 1 ]]; then
+      echo "1 second ago"
+    else
+      echo "$seconds seconds ago"
+    fi
+  fi
+}

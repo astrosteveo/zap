@@ -136,7 +136,7 @@ zap() {
 }
 
 #
-# _zap_cmd_load - Load a plugin
+# _zap_cmd_load - Load a plugin (LEGACY - DEPRECATED)
 #
 # Purpose: Parse, download (if needed), and source a plugin
 # Parameters:
@@ -146,7 +146,23 @@ zap() {
 # WHY: Core plugin loading operation (FR-006, FR-008)
 # Implements graceful degradation - errors don't block shell startup (FR-015)
 #
+# DEPRECATION WARNING (T117-T118):
+# This imperative command is deprecated in favor of declarative plugin management.
+# Plugins loaded via 'zap load' are marked as experimental for reconciliation.
+# Migrate to plugins=() array in .zshrc for better state management.
+#
 _zap_cmd_load() {
+  # T118: Show deprecation warning (only once per session)
+  if [[ -z "${_ZAP_LOAD_WARNING_SHOWN:-}" ]]; then
+    echo "⚠️  Deprecation Notice: 'zap load' is deprecated" >&2
+    echo "   Recommended: Use declarative plugin management instead" >&2
+    echo "   Add to your .zshrc:" >&2
+    echo "     plugins=('$*')" >&2
+    echo "   Learn more: https://github.com/astrosteveo/zap#declarative-mode" >&2
+    echo "" >&2
+    export _ZAP_LOAD_WARNING_SHOWN=1
+  fi
+
   # Join all arguments to support both "owner/repo path:subdir" and "owner/repo path:sub dir"
   local spec="$*"
 
@@ -213,6 +229,23 @@ _zap_cmd_load() {
   if _zap_source_plugin "$owner" "$repo" "$subdir"; then
     # Update metadata (T033: track version and status)
     _zap_update_plugin_metadata "$owner" "$repo" "$version" "loaded"
+
+    # T117: Mark plugins loaded via 'zap load' as experimental for reconciliation
+    # This allows declarative commands (zap sync, zap status) to track them separately
+    _zap_load_state 2>/dev/null || true
+    local plugin_name="${owner}/${repo}"
+    local plugin_spec="$spec"
+    if [[ -n "${subdir}" ]]; then
+      plugin_spec="${owner}/${repo}:${subdir}"
+    fi
+    if [[ -n "${version}" ]]; then
+      plugin_spec="${owner}/${repo}@${version}"
+      if [[ -n "${subdir}" ]]; then
+        plugin_spec="${owner}/${repo}@${version}:${subdir}"
+      fi
+    fi
+    _zap_add_plugin_to_state "$plugin_name" "experimental" "$plugin_spec" "" "legacy_load" 2>/dev/null || true
+    _zap_write_state 2>/dev/null || true
 
     # Only show success on first load (FR-024: subsequent loads silent)
     if [[ ! -f "$cache_dir/.zap_loaded" ]]; then
@@ -360,6 +393,8 @@ _zap_cmd_update() {
 #
 # WHY: Enable users to see what's installed (FR-007, cli-interface.md)
 #
+# T119: Now shows plugin source (declarative vs imperative)
+#
 _zap_cmd_list() {
   local verbose=0
 
@@ -368,8 +403,9 @@ _zap_cmd_list() {
     verbose=1
   fi
 
-  # Load metadata
+  # Load metadata and state
   _zap_load_metadata
+  _zap_load_state 2>/dev/null || true
 
   # Get installed plugins
   local plugins
@@ -379,6 +415,8 @@ _zap_cmd_list() {
     echo "No plugins installed"
     echo ""
     echo "Add plugins to your ~/.zshrc:"
+    echo "  plugins=('zsh-users/zsh-syntax-highlighting')"
+    echo "Or use legacy command:"
     echo "  zap load zsh-users/zsh-syntax-highlighting"
     return 0
   fi
@@ -399,10 +437,30 @@ _zap_cmd_list() {
     local commit="${ZAP_PLUGIN_META[${plugin_id}:commit]:-unknown}"
     local last_check="${ZAP_PLUGIN_META[${plugin_id}:last_check]:-never}"
 
+    # T119: Get plugin source from state (declarative vs imperative)
+    local plugin_source="imperative"
+    local source_label="(legacy)"
+    if [[ -n "${_zap_plugin_state[$plugin_id]}" ]]; then
+      local metadata="${_zap_plugin_state[$plugin_id]}"
+      local state_field="${${(@s:|:)metadata}[1]}"
+      local source_field="${${(@s:|:)metadata}[6]}"
+
+      if [[ "$state_field" == "declared" ]]; then
+        plugin_source="declarative"
+        source_label="(array)"
+      elif [[ "$source_field" == "try_command" ]]; then
+        plugin_source="experimental"
+        source_label="(zap try)"
+      elif [[ "$source_field" == "legacy_load" ]]; then
+        plugin_source="imperative"
+        source_label="(zap load)"
+      fi
+    fi
+
     # Detect framework plugins
     local framework_note=""
     if [[ "$owner" == "ohmyzsh" || "$owner" == "sorin-ionescu" ]]; then
-      framework_note=" (framework)"
+      framework_note=" framework"
     fi
 
     if [[ $verbose -eq 1 ]]; then
@@ -411,6 +469,7 @@ _zap_cmd_list() {
       echo "    Version:  ${version:-latest}"
       echo "    Commit:   ${commit:0:12}"
       echo "    Status:   ✓ $plugin_status$framework_note"
+      echo "    Source:   $plugin_source $source_label"
       echo "    Checked:  $last_check"
       echo ""
     else
@@ -419,12 +478,12 @@ _zap_cmd_list() {
       [[ "$plugin_status" == "failed" ]] && status_symbol="✗"
       [[ "$plugin_status" == "disabled" ]] && status_symbol="○"
 
-      printf "  %-40s %-15s %s %s%s\n" \
+      printf "  %-40s %-15s %s %-10s %s\n" \
         "$plugin_id" \
         "${version:-latest}" \
         "$status_symbol" \
         "$plugin_status" \
-        "$framework_note"
+        "$source_label$framework_note"
     fi
   done
 

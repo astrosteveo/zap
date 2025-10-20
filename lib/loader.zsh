@@ -22,12 +22,14 @@ source "${0:A:h}/utils.zsh"
 # Priority order (FR-021):
 #   1. <name>.plugin.zsh
 #   2. <name>.zsh
-#   3. init.zsh
-#   4. <repo>.plugin.zsh
-#   5. <repo>.zsh
+#   3. <name>.zsh-theme  (for Oh-My-Zsh themes)
+#   4. init.zsh
+#   5. <repo>.plugin.zsh
+#   6. <repo>.zsh
+#   7. <repo>.zsh-theme
 #
 # WHY: Different plugin authors use different naming conventions. This priority
-# order supports the most common patterns (research.md §7)
+# order supports the most common patterns including Oh-My-Zsh themes (research.md §7)
 #
 _zap_find_plugin_file() {
   local cache_dir="$1"
@@ -60,9 +62,11 @@ _zap_find_plugin_file() {
   for candidate in \
     "${search_dir}/${plugin_name}.plugin.zsh" \
     "${search_dir}/${plugin_name}.zsh" \
+    "${search_dir}/${plugin_name}.zsh-theme" \
     "${search_dir}/init.zsh" \
     "${search_dir}/${repo_name}.plugin.zsh" \
-    "${search_dir}/${repo_name}.zsh"
+    "${search_dir}/${repo_name}.zsh" \
+    "${search_dir}/${repo_name}.zsh-theme"
   do
     # Early return on first match (T059: minimize iterations)
     [[ -f "$candidate" ]] && echo "$candidate" && return 0
@@ -134,7 +138,11 @@ _zap_source_plugin() {
   # Source the plugin file
   # WHY: Silent sourcing prevents plugin output from cluttering shell startup
   # T059: Direct source is faster than testing return code separately
-  source "$plugin_file" 2>/dev/null && return 0
+  if source "$plugin_file" 2>/dev/null; then
+    # Post-load actions for special plugin types
+    _zap_handle_post_load "$plugin_id" "$plugin_file"
+    return 0
+  fi
 
   # Source failed
   _zap_print_error "Failed to load $plugin_id" "Plugin source failed" \
@@ -142,6 +150,43 @@ _zap_source_plugin() {
   _zap_log_error "ERROR" "$plugin_id" "Source command failed" \
     "Check plugin for syntax errors"
   return 1
+}
+
+#
+# _zap_handle_post_load - Handle special post-load actions for specific plugins
+#
+# Purpose: Provide helpful guidance for plugins that need additional configuration
+# Parameters:
+#   $1 - Plugin identifier (owner/repo)
+#   $2 - Plugin file path that was sourced
+# Returns: 0 always
+#
+# WHY: Some plugins (especially themes) require additional configuration steps
+# that aren't obvious to new users. This improves first-time user experience.
+#
+_zap_handle_post_load() {
+  local plugin_id="$1"
+  local plugin_file="$2"
+
+  # Detect theme files
+  if [[ "$plugin_file" == *.zsh-theme ]]; then
+    # Special handling for powerlevel10k
+    if [[ "$plugin_id" == *"powerlevel10k"* ]]; then
+      # Only show configuration hint if p10k config doesn't exist and not in quiet mode
+      if [[ ! -f ~/.p10k.zsh ]] && [[ -z "${ZAP_QUIET:-}" ]]; then
+        echo ""
+        echo "💡 Powerlevel10k Quick Start:"
+        echo "   Run: p10k configure"
+        echo "   This will guide you through prompt customization."
+        echo ""
+        echo "   After configuration, add to your .zshrc:"
+        echo "   [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh"
+        echo ""
+      fi
+    fi
+  fi
+
+  return 0
 }
 
 #

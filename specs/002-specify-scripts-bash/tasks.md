@@ -166,7 +166,7 @@
 - [x] T065 [US3] Add --verbose flag support for zap sync in lib/declarative.zsh
 - [x] T066 [US3] Add state metadata update after sync in lib/declarative.zsh
 - [x] T067 [US3] Add logging for sync operations in lib/declarative.zsh
-- [ ] T068 [US3] Write unit test for drift calculation in tests/unit/declarative/test_drift_calculation.zsh
+- [x] T068 [US3] Write unit test for drift calculation in tests/unit/declarative/test_drift_calculation.zsh
 
 **Checkpoint**: All P1 user stories (1, 2, 3) should now be independently functional. This represents the core declarative paradigm: declare, experiment, reconcile.
 
@@ -204,7 +204,7 @@
 - [x] T085 [US4] Add --all flag support in zap adopt in lib/declarative.zsh
 - [x] T086 [US4] Add --yes flag support (skip confirmation) in zap adopt in lib/declarative.zsh
 - [x] T087 [US4] Add --verbose flag support for zap adopt in lib/declarative.zsh
-- [ ] T088 [US4] Write unit test for config file modification in tests/unit/declarative/test_config_modification.zsh
+- [x] T088 [US4] Write unit test for config file modification in tests/unit/declarative/test_config_modification.zsh
 
 **Checkpoint**: Users can now adopt experimental plugins to declared state. The full workflow (declare → try → adopt → sync) is complete.
 
@@ -241,7 +241,7 @@
 - [x] T104 [US5] Add preview output (+/- plugins) in zap diff in lib/declarative.zsh
 - [x] T105 [US5] Add --verbose flag support for zap diff in lib/declarative.zsh
 - [x] T106 [US5] Add exit code logic (0 = drift, 1 = in sync) in zap diff in lib/declarative.zsh
-- [ ] T107 [US5] Add time ago formatting for timestamps in lib/utils.zsh
+- [x] T107 [US5] Add time ago formatting for timestamps in lib/utils.zsh
 
 **Checkpoint**: Users can now inspect state drift before reconciling. The observability story is complete.
 
@@ -278,9 +278,9 @@
 
 **Purpose**: Ensure existing zap commands continue to work alongside declarative mode
 
-- [ ] T117 Mark legacy zap load command as experimental in lib/loader.zsh
-- [ ] T118 [P] Add deprecation warning for zap load in lib/loader.zsh
-- [ ] T119 [P] Update zap list to show declarative vs imperative sources in lib/loader.zsh
+- [x] T117 Mark legacy zap load command as experimental in lib/loader.zsh
+- [x] T118 [P] Add deprecation warning for zap load in lib/loader.zsh
+- [x] T119 [P] Update zap list to show declarative vs imperative sources in lib/loader.zsh
 - [ ] T120 [P] Update zap update to respect version pins from state in lib/updater.zsh
 - [ ] T121 [P] Update zap clean to preserve declared plugin state in lib/loader.zsh
 - [ ] T122 Write integration test for mixed mode (declarative + imperative) in tests/integration/declarative/test_mixed_mode.bats

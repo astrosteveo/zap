@@ -1126,6 +1126,19 @@ _zap_declarative_dispatch() {
           echo "  Backup saved: $backup_file"
           echo "  Plugin will now load automatically on shell startup"
 
+          # Special guidance for themes (especially powerlevel10k)
+          if [[ "$plugin_name" == *"powerlevel10k"* ]]; then
+            echo ""
+            echo "📝 Next steps for Powerlevel10k:"
+            echo "   1. Add this line to your $config_file (after sourcing zap):"
+            echo "      [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh"
+            echo ""
+            echo "   2. Run: p10k configure"
+            echo "      This will guide you through prompt customization"
+            echo ""
+            echo "   3. Restart your shell: exec zsh"
+          fi
+
           return 0
         else
           echo "Error: Failed to update $config_file" >&2
