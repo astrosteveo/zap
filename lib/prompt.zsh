@@ -10,6 +10,20 @@
 # - Informative (shows directory, git branch, exit status)
 # - Clean (minimal clutter)
 # - No dependencies (works everywhere)
+#
+# Configuration (via zstyle):
+#   zstyle ':zap:prompt' show-user 'always|auto|never'  # Show user@host (default: auto)
+#   zstyle ':zap:prompt' symbol '❯'                     # Prompt symbol (default: ❯)
+#
+# Examples:
+#   # Always show user@host
+#   zstyle ':zap:prompt' show-user 'always'
+#
+#   # Never show user@host
+#   zstyle ':zap:prompt' show-user 'never'
+#
+#   # Custom prompt symbol
+#   zstyle ':zap:prompt' symbol '➜'
 
 #
 # Initialize version control info system
@@ -55,30 +69,48 @@ _zap_prompt_precmd() {
 # WHY: Separate the prompt construction so it's easy to customize
 #
 
+# Read configuration from zstyles
+local show_user_config
+zstyle -s ':zap:prompt' show-user 'show_user_config' || show_user_config='auto'
+
+local prompt_symbol
+zstyle -s ':zap:prompt' symbol 'prompt_symbol' || prompt_symbol='❯'
+
 # Determine if we should show username@hostname
-# WHY: Show user@host only if:
-#      - Connected via SSH (indicates remote machine)
-#      - Running as root (security awareness)
-#      - Otherwise skip (saves space, less clutter on local machine)
-if [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" || "$EUID" -eq 0 ]]; then
-  _ZAP_PROMPT_USER="%n@%m "  # user@hostname
-else
-  _ZAP_PROMPT_USER=""        # Skip on local machine
-fi
+# WHY: Show user@host based on configuration:
+#      - 'always': Always show
+#      - 'never': Never show
+#      - 'auto' (default): Show if SSH or root
+case "$show_user_config" in
+  always)
+    _ZAP_PROMPT_USER="%n@%m "  # Always show user@hostname
+    ;;
+  never)
+    _ZAP_PROMPT_USER=""        # Never show
+    ;;
+  auto|*)
+    # Auto-detect: show if SSH or root
+    if [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" || "$EUID" -eq 0 ]]; then
+      _ZAP_PROMPT_USER="%n@%m "  # user@hostname
+    else
+      _ZAP_PROMPT_USER=""        # Skip on local machine
+    fi
+    ;;
+esac
 
 # Set the prompt
 # WHY: Single-line prompt with:
-#      - Optional user@host (if SSH or root)
+#      - Optional user@host (configurable)
 #      - Current directory (with ~ expansion)
 #      - Git branch (if in git repo)
-#      - Prompt symbol (changes color based on exit status)
+#      - Prompt symbol (configurable, changes color based on exit status)
 #
 # Format: user@host ~/path/to/dir branch ❯
 #
 setopt PROMPT_SUBST  # Enable parameter expansion in prompt
 
 PROMPT='${_ZAP_PROMPT_COLOR}${_ZAP_PROMPT_USER}%F{cyan}%~%f%F{yellow}${vcs_info_msg_0_}%f
-${_ZAP_PROMPT_COLOR}❯%f '
+${_ZAP_PROMPT_COLOR}'"${prompt_symbol}"'%f '
 
 # Right prompt (optional, disabled by default)
 # WHY: Some users like seeing timestamp or other info on the right

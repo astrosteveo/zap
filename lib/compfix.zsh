@@ -8,6 +8,13 @@
 #
 # Based on Oh-My-Zsh's compfix.zsh
 # Reference: https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/compfix.zsh
+#
+# Configuration (via zstyle):
+#   zstyle ':zap:completion' security-check 'yes|no'  # Enable security check (default: yes)
+#
+# Examples:
+#   # Disable security check (not recommended)
+#   zstyle ':zap:completion' security-check 'no'
 
 #
 # _zap_handle_completion_insecurities - Check and warn about insecure completion directories
@@ -20,7 +27,10 @@ _zap_handle_completion_insecurities() {
   # Skip check if user explicitly disabled it
   # WHY: Some environments (e.g., shared servers, containers) may have intentionally
   # relaxed permissions. Allow power users to bypass the check.
-  if [[ "$ZAP_DISABLE_COMPFIX" == true ]]; then
+  local security_check
+  zstyle -s ':zap:completion' security-check 'security_check' || security_check='yes'
+
+  if [[ "$security_check" == 'no' ]]; then
     return 0
   fi
 
@@ -58,7 +68,8 @@ _zap_handle_completion_insecurities() {
 [zap]      exec zsh
 
 [zap] If you understand the security risk and want to skip this check:
-[zap]   Set ZAP_DISABLE_COMPFIX=true in your ~/.zshrc before sourcing zap
+[zap]   Add this to your ~/.zshrc or ~/.zaprc:
+[zap]   zstyle ':zap:completion' security-check 'no'
 
 [zap] Completions will be disabled until this is resolved.
 EOD

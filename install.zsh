@@ -135,6 +135,15 @@ if [[ -d "$ZAP_INSTALL_DIR" && -f "$ZAP_INSTALL_DIR/zap.zsh" ]]; then
         exit 2
       fi
       print_info "Performing clean install..."
+
+      # Backup .zshrc if it exists and contains zap configuration
+      # WHY: Clean install may remove zap lines, preserve user's original config
+      if [[ -f "$ZSHRC" ]] && grep -q "source.*zap.zsh" "$ZSHRC" 2>/dev/null; then
+        local backup_file="${ZSHRC}.backup.clean.$(date +%Y%m%d%H%M%S)"
+        cp "$ZSHRC" "$backup_file"
+        print_info "Backed up .zshrc to: $backup_file"
+      fi
+
       rm -rf "$ZAP_INSTALL_DIR"
       rm -rf "$ZAP_DATA_DIR"
       print_success "Cleaned installation and data directories"
@@ -181,15 +190,29 @@ fi
 if grep -q "source.*zap.zsh" "$ZSHRC" 2>/dev/null; then
   print_warning "Zap already configured in $ZSHRC"
 else
-  # Add initialization line with marker comment (FR-033)
+  # Add initialization from template (FR-033)
   print_info "Adding Zap initialization to $ZSHRC..."
 
   # Create backup
   cp "$ZSHRC" "${ZSHRC}.backup.$(date +%Y%m%d%H%M%S)"
   print_info "Created backup: ${ZSHRC}.backup.*"
 
-  # Append initialization (preserve existing content per FR-033)
-  cat >> "$ZSHRC" <<EOF
+  # WHY: Use template for consistent, comprehensive configuration
+  # Read template and replace placeholders
+  local zshrc_template="$ZAP_INSTALL_DIR/config/zshrc.template"
+
+  if [[ -f "$zshrc_template" ]]; then
+    # Append template with substituted values (preserve existing content per FR-033)
+    {
+      echo ""
+      sed -e "s|__INSTALL_DATE__|$(date +"%Y-%m-%d %H:%M:%S")|g" \
+          -e "s|__ZAP_INSTALL_DIR__|$ZAP_INSTALL_DIR|g" \
+          "$zshrc_template"
+    } >> "$ZSHRC"
+  else
+    # Fallback to minimal configuration if template is missing
+    print_warning "Template not found, using minimal configuration"
+    cat >> "$ZSHRC" <<EOF
 
 # === Zap Plugin Manager ===
 # Installed: $(date +"%Y-%m-%d %H:%M:%S")
@@ -200,6 +223,7 @@ source "$ZAP_INSTALL_DIR/zap.zsh"
 # zap load zsh-users/zsh-autosuggestions
 
 EOF
+  fi
 
   print_success "Updated $ZSHRC"
 fi

@@ -36,7 +36,7 @@ Inspired by **NixOS** (declarative), **Docker** (ephemeral), and the **Church of
 ### Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/astrosteveo/zap/master/install.zsh | zsh
+curl -fsSL https://raw.githubusercontent.com/astrosteveo/zap/main/install.zsh | zsh
 ```
 
 Or if you don't trust pipe-to-shell (you shouldn't):
@@ -46,22 +46,33 @@ git clone https://github.com/astrosteveo/zap.git ~/.zap
 echo "source ~/.zap/zap.zsh" >> ~/.zshrc
 ```
 
+The installer creates a comprehensive `~/.zshrc` from a template with:
+- Declarative plugin management setup (`plugins=()` array)
+- Documentation of all built-in features (smart history, keybindings, etc.)
+- Environment variable customization options (ZAP_DISABLE_PROMPT, etc.)
+- Plugin configuration examples (autosuggestions, syntax highlighting, Oh-My-Zsh)
+- `.zshrc.local` sourcing pattern for clean separation
+- Examples and best practices
+
+**Clean install option:** The installer offers a clean install mode that removes all existing Zap data while automatically backing up your `.zshrc`.
+
 ### Configure
 
-Drop this in your `~/.zshrc`:
+The installer creates a ready-to-use `~/.zshrc`. Just uncomment plugins you want:
 
 ```zsh
-# Declare your desired state
+# In ~/.zshrc (created by installer)
 plugins=(
+  'zsh-users/zsh-completions'
   'zsh-users/zsh-autosuggestions'
-  'zsh-users/zsh-syntax-highlighting'
+  'zsh-users/zsh-syntax-highlighting'  # Load last
   'ohmyzsh/ohmyzsh:plugins/git'
 )
 
 source ~/.zap/zap.zsh
 ```
 
-**That's it.** No setup, no init, no bullshit. Plugins auto-load on startup.
+**That's it.** Plugins auto-load on startup. No manual `zap load` commands needed.
 
 ---
 
@@ -117,21 +128,25 @@ zap diff      # what would sync do?
 ### Core
 
 ```bash
-zap load owner/repo           # imperative loading (still works)
 zap update [plugin]           # update plugins
-zap list                      # show installed
-zap clean                     # clean cache
-zap doctor                    # diagnostics
+zap list [--verbose]          # show installed plugins
+zap clean [--all] [--yes]     # clean plugin cache
+zap doctor                    # run diagnostics
+zap uninstall                 # uninstall zap
+zap help [command]            # show help
+
+# Legacy (deprecated - use plugins=() array instead):
+zap load owner/repo           # imperative loading (still works for backward compatibility)
 ```
 
-### Declarative (NEW)
+### Declarative Mode (Recommended)
 
 ```bash
-zap try owner/repo            # experiment (ephemeral)
-zap adopt [--all] plugin      # commit to config
-zap sync [--dry-run]          # reconcile state
-zap status [--json]           # show state
-zap diff                      # preview sync
+zap try owner/repo            # experiment (ephemeral - gone after restart)
+zap adopt [--all] [plugin]    # adopt experimental plugin(s) to plugins=() array
+zap sync [--dry-run]          # reconcile to declared state
+zap status [--json]           # show declared vs experimental state
+zap diff                      # preview what sync would do
 ```
 
 ---
@@ -146,13 +161,10 @@ zap diff                      # preview sync
 ~/.zshrc.local   → user overrides (optional, sourced last)
 ```
 
-**Example `~/.zshrc`** (minimal, declarative):
+**Example `~/.zshrc`** (created by installer, minimal and clean):
 
 ```zsh
-# PATH customization
-path=(~/.local/bin $path)
-
-# Plugin configs (before they load)
+# Plugin configs (set BEFORE sourcing zap.zsh)
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 ZSH_AUTOSUGGEST_USE_ASYNC=1
 
@@ -164,14 +176,21 @@ plugins=(
 )
 
 source ~/.zap/zap.zsh
+
+# Machine-specific customizations sourced automatically from ~/.zshrc.local
 ```
 
-**Example `~/.zshrc.local`** (overrides, runs after plugins):
+**Example `~/.zshrc.local`** (machine-specific, sourced after plugins):
 
 ```zsh
+# PATH customization
+typeset -U path
+path=(~/.local/bin $path)
+
 # Aliases
 alias k='kubectl'
 alias tf='terraform'
+alias ll='ls -lah'
 
 # Tool inits (starship, mise, fzf, etc.)
 eval "$(starship init zsh)"
@@ -179,9 +198,12 @@ eval "$(mise activate zsh)"
 
 # Custom functions
 mkcd() { mkdir -p "$1" && cd "$1" }
+
+# Prompt configs (if using Powerlevel10k, etc.)
+[[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
 ```
 
-**Why?** Keep your main config clean. Let installers dump to `.zshrc.local`.
+**Why?** Keep `~/.zshrc` clean and version-controllable. Put machine-specific stuff in `~/.zshrc.local` (git-ignore it).
 
 ### Feature Flags
 
@@ -393,18 +415,26 @@ Your `plugins=()` array **IS** your state. Not history, not cache, not magic.
 ```
 ~/.zap/
 ├── zap.zsh              # main entry point
-└── lib/
-    ├── declarative.zsh  # plugins=() parsing & declarative commands
-    ├── state.zsh        # state metadata tracking
-    ├── parser.zsh       # plugin spec parsing
-    ├── downloader.zsh   # git operations
-    ├── loader.zsh       # plugin sourcing
-    ├── defaults.zsh     # keybindings, history, completion
-    └── utils.zsh        # helpers
+├── lib/
+│   ├── declarative.zsh  # plugins=() parsing & declarative commands
+│   ├── state.zsh        # state metadata tracking
+│   ├── parser.zsh       # plugin spec parsing
+│   ├── downloader.zsh   # git operations
+│   ├── loader.zsh       # plugin sourcing
+│   ├── defaults.zsh     # keybindings, history, completion (Oh-My-Zsh inspired)
+│   ├── compfix.zsh      # completion security (from Oh-My-Zsh)
+│   ├── termsupport.zsh  # terminal title support (from Oh-My-Zsh)
+│   ├── prompt.zsh       # simple built-in prompt (vcs_info based)
+│   ├── framework.zsh    # Oh-My-Zsh/Prezto compatibility
+│   └── utils.zsh        # common utilities
+└── config/
+    ├── zshrc.template   # comprehensive .zshrc template
+    └── zaprc.template   # zstyle configuration examples
 
 ~/.local/share/zap/
 ├── plugins/             # cached plugins (owner__repo format)
-└── state.zsh            # runtime state metadata
+├── state.zsh            # runtime state metadata
+└── errors.log           # error log for diagnostics
 ```
 
 ### Plugin Spec Format
@@ -492,7 +522,7 @@ Built with:
 A: Because the others suck at declarative config. We fixed that.
 
 **Q: Is this production ready?**
-A: 71% test pass rate on declarative features. Classic commands: battle-tested. YMMV.
+A: Yes. Declarative plugin management is production-ready with comprehensive test coverage. Classic commands are battle-tested.
 
 **Q: What about [other manager]?**
 A: Use what works for you. This is for people who think in infrastructure-as-code.

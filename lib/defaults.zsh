@@ -265,8 +265,20 @@ zstyle ':completion:*' list-colors ''
 
 # Set history file and size
 # WHY: Default location if not set; increase size to 50k (Oh-My-Zsh standard)
-[ -z "$HISTFILE" ] && HISTFILE="$ZAP_DATA_DIR/.zsh_history"
-[ "$HISTSIZE" -lt 50000 ] && HISTSIZE=50000
+# Configuration via zstyle:
+#   zstyle ':zap:history' file '/path/to/history'
+#   zstyle ':zap:history' size '100000'
+#   zstyle ':zap:history' share 'yes|no'  (default: no)
+
+# Read history file from zstyle or use default
+local history_file
+zstyle -s ':zap:history' file 'history_file' || history_file="$ZAP_DATA_DIR/.zsh_history"
+[ -z "$HISTFILE" ] && HISTFILE="$history_file"
+
+# Read history size from zstyle or use default
+local history_size
+zstyle -s ':zap:history' size 'history_size' || history_size=50000
+[ "$HISTSIZE" -lt "$history_size" ] && HISTSIZE="$history_size"
 [ "$SAVEHIST" -lt 10000 ] && SAVEHIST=10000
 
 # History behavior options
@@ -277,10 +289,13 @@ setopt HIST_IGNORE_SPACE      # Don't record commands starting with space
 setopt HIST_VERIFY            # Show command with history expansion (!!) before running it
 setopt HIST_FIND_NO_DUPS      # Don't display duplicates when searching
 
-# Share history across sessions (opt-in via ZAP_SHARE_HISTORY=true)
+# Share history across sessions (configurable via zstyle)
 # WHY: Some users love it (instant history sync), others hate it (per-session isolation).
-# Default to off for predictable behavior, opt-in for power users.
-if [[ "$ZAP_SHARE_HISTORY" == true ]]; then
+# Default to 'no' for predictable behavior.
+local share_history
+zstyle -s ':zap:history' share 'share_history' || share_history='no'
+
+if [[ "$share_history" == 'yes' ]]; then
   setopt SHARE_HISTORY        # Share command history data across all sessions
 fi
 

@@ -7,6 +7,21 @@
 #
 # Based on Oh-My-Zsh's termsupport.zsh
 # Reference: https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/termsupport.zsh
+#
+# Configuration (via zstyle):
+#   zstyle ':zap:terminal' title 'yes|no'  # Enable auto-title (default: yes)
+#   zstyle ':zap:terminal' osc7 'yes|no'   # Enable OSC 7 (default: yes)
+#
+# Examples:
+#   # Disable auto-title
+#   zstyle ':zap:terminal' title 'no'
+
+# Read configuration
+local enable_title
+zstyle -s ':zap:terminal' title 'enable_title' || enable_title='yes'
+
+# Exit early if disabled
+[[ "$enable_title" == 'no' ]] && return 0
 
 #
 # _zap_title - Set terminal window and tab/icon title
@@ -67,7 +82,6 @@ fi
 # WHY: This hook runs before each prompt display, showing idle state
 #
 _zap_termsupport_precmd() {
-  [[ "${DISABLE_AUTO_TITLE:-}" == true ]] && return
   _zap_title "$ZAP_THEME_TERM_TAB_TITLE_IDLE" "$ZAP_THEME_TERM_TITLE_IDLE"
 }
 
@@ -82,8 +96,6 @@ _zap_termsupport_precmd() {
 #      for tracking long-running commands across multiple terminal tabs.
 #
 _zap_termsupport_preexec() {
-  [[ "${DISABLE_AUTO_TITLE:-}" == true ]] && return
-
   emulate -L zsh
   setopt extended_glob
 

@@ -69,9 +69,13 @@ source "$ZAP_DIR/lib/defaults.zsh"
 # WHY: Automatically sets terminal title to show running command
 source "$ZAP_DIR/lib/termsupport.zsh"
 
-# Source simple built-in prompt (opt-out via ZAP_DISABLE_PROMPT=true)
+# Source simple built-in prompt (configurable via zstyle)
 # WHY: Provide clean, fast prompt out of the box. Users can disable if using Starship/custom prompt.
-if [[ "$ZAP_DISABLE_PROMPT" != true ]]; then
+# Configuration: zstyle ':zap:prompt' enable 'yes|no'  (default: yes)
+local enable_prompt
+zstyle -s ':zap:prompt' enable 'enable_prompt' || enable_prompt='yes'
+
+if [[ "$enable_prompt" != 'no' ]]; then
   source "$ZAP_DIR/lib/prompt.zsh"
 fi
 

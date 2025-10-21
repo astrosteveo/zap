@@ -185,7 +185,9 @@ _zap_list_installed_plugins() {
   fi
 
   # List all plugin directories
-  for plugin_dir in "$ZAP_PLUGIN_DIR"/*; do
+  # WHY: (N) glob qualifier makes pattern expand to nothing if no matches,
+  # preventing "no matches found" error when plugin directory is empty
+  for plugin_dir in "$ZAP_PLUGIN_DIR"/*(N); do
     if [[ ! -d "$plugin_dir" ]]; then
       continue
     fi
