@@ -124,6 +124,9 @@ zap() {
     uninstall)
       _zap_cmd_uninstall "$@"
       ;;
+    upgrade)
+      _zap_cmd_upgrade "$@"
+      ;;
     # Declarative plugin management commands (Feature 002)
     try|sync|status|diff|adopt)
       _zap_declarative_dispatch "$subcommand" "$@"
@@ -288,6 +291,7 @@ Usage:
   zap list [--verbose]
   zap clean [--all]
   zap doctor
+  zap upgrade
   zap help [<command>]
 
 Examples:
@@ -295,6 +299,7 @@ Examples:
   zap load zsh-users/zsh-autosuggestions@v0.7.0
   zap load ohmyzsh/ohmyzsh path:plugins/git
   zap update
+  zap upgrade
   zap list
 
 For more help: zap help <command>
@@ -908,6 +913,102 @@ _zap_cmd_uninstall() {
   echo "Thank you for trying zap! 👋"
 
   return 0
+}
+
+#
+# _zap_cmd_upgrade - Update Zap itself to the latest version
+#
+# Purpose: Pull latest changes from GitHub to update Zap
+# Parameters: None
+# Returns: 0 on success, 1 on failure
+#
+# WHY: Users need an easy way to update Zap itself (like homebrew upgrade)
+#
+_zap_cmd_upgrade() {
+  echo "Zap Upgrade"
+  echo "==========="
+  echo ""
+
+  # Check if ZAP_DIR is a git repository
+  if [[ ! -d "$ZAP_DIR/.git" ]]; then
+    echo "✗ Cannot upgrade: $ZAP_DIR is not a git repository"
+    echo ""
+    echo "This usually happens if you installed zap by:"
+    echo "  1. Downloading a zip file"
+    echo "  2. Copying files manually"
+    echo ""
+    echo "To enable auto-upgrade, reinstall zap using:"
+    echo "  curl -fsSL https://raw.githubusercontent.com/astrosteveo/zap/main/install.zsh | zsh"
+    return 1
+  fi
+
+  # Check if git is available
+  if ! command -v git >/dev/null 2>&1; then
+    echo "✗ Git not found. Please install git to upgrade zap."
+    return 1
+  fi
+
+  echo "Current location: $ZAP_DIR"
+  echo ""
+
+  # Get current commit
+  local current_commit=$(git -C "$ZAP_DIR" rev-parse --short HEAD 2>/dev/null)
+  local current_branch=$(git -C "$ZAP_DIR" rev-parse --abbrev-ref HEAD 2>/dev/null)
+
+  echo "Current version:"
+  echo "  Branch: $current_branch"
+  echo "  Commit: $current_commit"
+  echo ""
+
+  # Fetch latest changes
+  echo "Checking for updates..."
+  if ! git -C "$ZAP_DIR" fetch origin 2>/dev/null; then
+    echo "✗ Failed to fetch updates from GitHub"
+    echo "  Check your internet connection and try again"
+    return 1
+  fi
+
+  # Check if there are updates
+  local remote_commit=$(git -C "$ZAP_DIR" rev-parse --short "origin/$current_branch" 2>/dev/null)
+
+  if [[ "$current_commit" == "$remote_commit" ]]; then
+    echo "✓ Already up to date!"
+    echo ""
+    echo "You're running the latest version of zap."
+    return 0
+  fi
+
+  echo "Update available:"
+  echo "  New commit: $remote_commit"
+  echo ""
+
+  # Show what changed
+  echo "Changes:"
+  git -C "$ZAP_DIR" log --oneline --no-decorate "$current_commit..$remote_commit" 2>/dev/null | head -10 | while read -r line; do
+    echo "  • $line"
+  done
+  echo ""
+
+  # Pull updates
+  echo "Updating zap..."
+  if git -C "$ZAP_DIR" pull --ff-only origin "$current_branch" >/dev/null 2>&1; then
+    echo "✓ Upgrade complete!"
+    echo ""
+    echo "Updated from $current_commit to $remote_commit"
+    echo ""
+    echo "To apply changes, restart your shell:"
+    echo "  exec zsh"
+    return 0
+  else
+    echo "✗ Failed to upgrade"
+    echo ""
+    echo "This might happen if you have local changes to zap."
+    echo "Try manually updating:"
+    echo "  cd $ZAP_DIR"
+    echo "  git status"
+    echo "  git pull"
+    return 1
+  fi
 }
 
 # Initialize completion system
