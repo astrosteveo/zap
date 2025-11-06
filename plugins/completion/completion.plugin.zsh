@@ -11,13 +11,13 @@
 # - https://htr3n.github.io/2018/07/faster-zsh/
 
 0=${(%):-%N}
-zstyle -t ':zephyr:lib:bootstrap'    loaded || source ${0:a:h:h:h}/lib/bootstrap.zsh
-zstyle -t ':zephyr:plugin:compstyle' loaded || source $ZEPHYR_HOME/plugins/compstyle/compstyle.plugin.zsh
+zstyle -t ':zap:lib:bootstrap'    loaded || source ${0:a:h:h:h}/lib/bootstrap.zsh
+zstyle -t ':zap:plugin:compstyle' loaded || source $zap_HOME/plugins/compstyle/compstyle.plugin.zsh
 #endregion
 
 # Return if requirements are not met.
 [[ "$TERM" != 'dumb' ]] || return 1
-! zstyle -t ":zephyr:plugin:completion" skip || return 0
+! zstyle -t ":zap:plugin:completion" skip || return 0
 
 # Set completion options.
 setopt always_to_end        # Move cursor to the end of a completed word.
@@ -39,7 +39,7 @@ function run_compinit {
   # Use ZSH_COMPDUMP for the completion file.
   typeset -g ZSH_COMPDUMP
   if [[ -z "$ZSH_COMPDUMP" ]]; then
-    if zstyle -T ':zephyr:plugin:completion' use-xdg-basedirs; then
+    if zstyle -T ':zap:plugin:completion' use-xdg-basedirs; then
       ZSH_COMPDUMP=$__zsh_cache_dir/zcompdump
     else
       ZSH_COMPDUMP=$HOME/.zcompdump
@@ -62,14 +62,14 @@ function run_compinit {
   # -u        : Allow insecure directories in fpath
   # -d <file> : Specify zcompdump file
   local -a compinit_flags=(-i)
-  if zstyle -t ':zephyr:plugin:completion' 'disable-compfix'; then
+  if zstyle -t ':zap:plugin:completion' 'disable-compfix'; then
     compinit_flags=(-u)
   fi
   compinit_flags+=(-d "$ZSH_COMPDUMP")
 
   # Initialize completions
   autoload -Uz compinit
-  if zstyle -t ':zephyr:plugin:completion' 'use-cache'; then
+  if zstyle -t ':zap:plugin:completion' 'use-cache'; then
     # Load and initialize the completion system ignoring insecure directories with a
     # cache time of 20 hours, so it should almost always regenerate the first time a
     # shell is opened each day.
@@ -100,7 +100,7 @@ function run_compinit {
 # be fully populated prior to calling it. But sometimes you need to call compdef before
 # fpath is done being populated (eg: plugins do this). compinit has big chicken-and-egg
 # problems. This code handles all those completion use-cases by wrapping compinit,
-# queueing any calls to compdef, and hooking the real call to compinit to Zephyr's
+# queueing any calls to compdef, and hooking the real call to compinit to zap's
 # custom post_zshrc event.
 
 # Define compinit placeholder functions (compdef) so we can queue up calls.
@@ -131,7 +131,7 @@ function compinit {
 }
 
 # Set the completion style
-zstyle -s ':zephyr:plugin:completion' compstyle 'zcompstyle' || zcompstyle=zephyr
+zstyle -s ':zap:plugin:completion' compstyle 'zcompstyle' || zcompstyle=zap
 if (( $+functions[compstyle_${zcompstyle}_setup] )); then
   compstyle_${zcompstyle}_setup
 elif [[ "$zcompstyle" != none ]]; then
@@ -142,12 +142,12 @@ unset zcompstyle
 
 # Allow the user to bypass the compinit deferral and run it immediately. Otherwise, we
 # hook run_compinit to the custom post_zshrc event.
-if zstyle -t ':zephyr:plugin:completion' immediate; then
+if zstyle -t ':zap:plugin:completion' immediate; then
   run_compinit || return 1
 else
   post_zshrc_hook+=(run_compinit)
 fi
 
 #region MARK LOADED
-zstyle ':zephyr:plugin:completion' loaded 'yes'
+zstyle ':zap:plugin:completion' loaded 'yes'
 #endregion

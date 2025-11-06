@@ -11,7 +11,7 @@ Init
 Test plugin is not initialized
 
 ```zsh
-% zstyle -t ':zephyr:plugin:history' loaded || echo "not loaded"
+% zstyle -t ':zap:plugin:history' loaded || echo "not loaded"
 not loaded
 % test "$SAVEHIST" -le 1000  #=> --exit 0
 % test "$HISTSIZE" -le 2000  #=> --exit 0
@@ -24,14 +24,14 @@ norcs
 Initialize plugin
 
 ```zsh
-% source $ZEPHYR_HOME/plugins/history/history.plugin.zsh; setopt clobber
+% source $zap_HOME/plugins/history/history.plugin.zsh; setopt clobber
 %
 ```
 
 Test plugin is initialized
 
 ```zsh
-% zstyle -t ':zephyr:plugin:history' loaded || echo "not loaded"
+% zstyle -t ':zap:plugin:history' loaded || echo "not loaded"
 % echo "$SAVEHIST"
 100000
 % echo "$HISTSIZE"

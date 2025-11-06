@@ -4,11 +4,11 @@
 #
 
 0=${(%):-%N}
-zstyle -t ':zephyr:lib:bootstrap' loaded || source ${0:a:h:h:h}/lib/bootstrap.zsh
+zstyle -t ':zap:lib:bootstrap' loaded || source ${0:a:h:h:h}/lib/bootstrap.zsh
 #endregion
 
-# Support skipping this plugin - useful if loading everything through zephyr.zsh.
-! zstyle -t ":zephyr:plugin:prompt" skip || return 0
+# Support skipping this plugin - useful if loading everything through zap.zsh.
+! zstyle -t ":zap:plugin:prompt" skip || return 0
 
 # Prompt options
 setopt prompt_subst       # Expand parameters in prompt variables.
@@ -37,13 +37,13 @@ function prompt_starship_setup {
     local -a configs=(
       "$__zsh_config_dir/themes/${1}.toml"(N)
       "${XDG_CONFIG_HOME:-$HOME/.config}/starship/${1}.toml"(N)
-      "$ZEPHYR_HOME/plugins/prompt/themes/${1}.toml"(N)
+      "$zap_HOME/plugins/prompt/themes/${1}.toml"(N)
     )
     (( $#configs )) && export STARSHIP_CONFIG=$configs[1]
   fi
 
   # Initialize starship.
-  if zstyle -t ':zephyr:plugin:prompt' 'use-cache'; then
+  if zstyle -t ':zap:plugin:prompt' 'use-cache'; then
     cached-eval 'starship-init-zsh' starship init zsh
   else
     source <(starship init zsh)
@@ -79,8 +79,8 @@ function run_promptinit {
 
   # Set the prompt if specified.
   local -a prompt_argv
-  zstyle -a ':zephyr:plugin:prompt' theme 'prompt_argv' \
-    || prompt_argv=(starship zephyr)
+  zstyle -a ':zap:plugin:prompt' theme 'prompt_argv' \
+    || prompt_argv=(starship zap)
   if [[ $TERM == (dumb|linux|*bsd*) ]]; then
     prompt 'off'
   elif (( $#prompt_argv > 0 )); then
@@ -90,12 +90,12 @@ function run_promptinit {
 
 # Allow the user to bypass the promptinit deferral and run it immediately.
 # Otherwise, we hook run_promptinit to the custom post_zshrc event.
-if zstyle -t ':zephyr:plugin:prompt' immediate; then
+if zstyle -t ':zap:plugin:prompt' immediate; then
   run_promptinit || return 1
 else
   post_zshrc_hook+=(run_promptinit)
 fi
 
 #region MARK LOADED
-zstyle ":zephyr:plugin:prompt" loaded 'yes'
+zstyle ":zap:plugin:prompt" loaded 'yes'
 #endregion

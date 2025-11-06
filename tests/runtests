@@ -3,8 +3,8 @@
 
 setopt extended_glob
 
-ZEPHYR_HOME=${0:a:h:h}
-cd $ZEPHYR_HOME
+zap_HOME=${0:a:h:h}
+cd $zap_HOME
 
 local o_unit
 zparseopts -D -M -- -unit=o_unit || return 1
@@ -22,7 +22,7 @@ fi
 # env -i PATH=$PATH FPATH=$FPATH \
 #  zsh -f -- =clitest --list-run --progress dot --prompt '%' --color always $PWD/tests/foo.md
 
-env -i PATH=$PATH FPATH=$FPATH PAGER=cat ZEPHYR_HOME=$ZEPHYR_HOME TERM=xterm-256color \
+env -i PATH=$PATH FPATH=$FPATH PAGER=cat zap_HOME=$zap_HOME TERM=xterm-256color \
     zsh -f -- \
     =clitest \
         --list-run --progress dot --prompt '%' \

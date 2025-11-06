@@ -9,7 +9,7 @@
 # - https://zsh.sourceforge.io/Doc/Release/Options.html#History
 
 0=${(%):-%N}
-zstyle -t ':zephyr:lib:bootstrap' loaded || source ${0:a:h:h:h}/lib/bootstrap.zsh
+zstyle -t ':zap:lib:bootstrap' loaded || source ${0:a:h:h:h}/lib/bootstrap.zsh
 #endregion
 
 # Set Zsh options related to history.
@@ -28,11 +28,11 @@ setopt NO_hist_beep            # Don't beep when accessing non-existent history.
 setopt NO_share_history        # Don't share history between all sessions.
 
 # Set the path to the default history file.
-if zstyle -s ':zephyr:plugin:history' histfile 'HISTFILE'; then
+if zstyle -s ':zap:plugin:history' histfile 'HISTFILE'; then
   # Make sure the user didn't store a HISTFILE with a leading '~'.
   HISTFILE="${~HISTFILE}"
 else
-  if zstyle -T ':zephyr:plugin:history' use-xdg-basedirs; then
+  if zstyle -T ':zap:plugin:history' use-xdg-basedirs; then
     HISTFILE="${__zsh_user_data_dir}/zsh_history"
   else
     HISTFILE="${ZDOTDIR:-$HOME}/.zsh_history"
@@ -43,19 +43,19 @@ fi
 [[ -d "${HISTFILE:h}" ]] || mkdir -p "${HISTFILE:h}"
 
 # Set history file size.
-zstyle -s ':zephyr:plugin:history' savehist 'SAVEHIST' \
+zstyle -s ':zap:plugin:history' savehist 'SAVEHIST' \
   || SAVEHIST=100000
 
 # Set session history size.
-zstyle -s ':zephyr:plugin:history' histsize 'HISTSIZE' \
+zstyle -s ':zap:plugin:history' histsize 'HISTSIZE' \
   || HISTSIZE=20000
 
 # Set history aliases.
-if ! zstyle -t ':zephyr:plugin:history:alias' skip; then
+if ! zstyle -t ':zap:plugin:history:alias' skip; then
   alias hist='fc -li'
   alias history-stat="history 0 | awk '{print \$2}' | sort | uniq -c | sort -n -r | head"
 fi
 
 #region MARK LOADED
-zstyle ':zephyr:plugin:history' loaded 'yes'
+zstyle ':zap:plugin:history' loaded 'yes'
 #endregion

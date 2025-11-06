@@ -33,14 +33,14 @@ function t_setup {
   0=${(%):-%x}
 
   # save zstyles, and clear them all for the test session
-  typeset -ga T_PREV_ZSTYLES=( ${(@f)"$(zstyle -L ':zephyr:*')"} )
-  source <(zstyle -L ':zephyr:*' | awk '{print "zstyle -d",$2}')
+  typeset -ga T_PREV_ZSTYLES=( ${(@f)"$(zstyle -L ':zap:*')"} )
+  source <(zstyle -L ':zap:*' | awk '{print "zstyle -d",$2}')
 
   # Set everything to run immediately
-  zstyle ':zephyr:plugin:*' immediate 'yes'
+  zstyle ':zap:plugin:*' immediate 'yes'
 
   # works with BSD and GNU gmktemp
-  typeset -gx T_TEMPDIR=${$(mktemp -d -t t_zephyr.XXXXXXXX):A}
+  typeset -gx T_TEMPDIR=${$(mktemp -d -t t_zap.XXXXXXXX):A}
   typeset -gx OLD_HOME=$HOME
   typeset -gx HOME=$T_TEMPDIR
   mkdir -p $T_TEMPDIR/.zsh
@@ -89,7 +89,7 @@ function t_teardown {
     completion_styles
     completion_style
     key_info
-    __zephyr_compdef_queue
+    __zap_compdef_queue
   )
   for varname in $globalvars; do
     unset $varname &>/dev/null
@@ -99,7 +99,7 @@ function t_teardown {
   fpath=( $T_PREV_FPATH )
 
   # restore original zstyles
-  source <(zstyle -L ':zephyr:*' | awk '{print "zstyle -d",$2}')
+  source <(zstyle -L ':zap:*' | awk '{print "zstyle -d",$2}')
   source <(printf '%s\n' $T_PREV_ZSTYLES)
 
   # remove tempdir

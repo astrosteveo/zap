@@ -11,7 +11,7 @@ Init
 Test plugin is not initialized
 
 ```zsh
-% zstyle -t ':zephyr:plugin:environment' loaded || echo "not loaded"
+% zstyle -t ':zap:plugin:environment' loaded || echo "not loaded"
 not loaded
 % test -v EDITOR  #=> --exit 1
 % test -v VISUAL  #=> --exit 1
@@ -24,14 +24,14 @@ norcs
 Initialize plugin
 
 ```zsh
-% source $ZEPHYR_HOME/plugins/environment/environment.plugin.zsh
+% source $zap_HOME/plugins/environment/environment.plugin.zsh
 %
 ```
 
 Test plugin is initialized
 
 ```zsh
-% zstyle -t ':zephyr:plugin:environment' loaded || echo "not loaded"
+% zstyle -t ':zap:plugin:environment' loaded || echo "not loaded"
 % test -v EDITOR  #=> --exit 0
 % test -v VISUAL  #=> --exit 0
 % set -o | grep 'on$' | awk '{print $1}' | sort

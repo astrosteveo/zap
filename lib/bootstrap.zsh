@@ -1,11 +1,11 @@
 #region HEADER
 #
-# bootstrap: Ensure Zephyr is properly boostrapped.
+# bootstrap: Ensure zap is properly boostrapped.
 #
 
-# Set ZEPHYR_HOME.
+# Set zap_HOME.
 0=${(%):-%N}
-: ${ZEPHYR_HOME:=${0:a:h:h}}
+: ${zap_HOME:=${0:a:h:h}}
 #endregion
 
 # Set critical Zsh options.
@@ -49,10 +49,10 @@ autoload -U add-zsh-hook
 add-zsh-hook precmd run_post_zshrc
 
 #region LOAD HELPERS
-zstyle -t ':zephyr:plugin:helper' loaded \
-  || source $ZEPHYR_HOME/plugins/helper/helper.plugin.zsh
+zstyle -t ':zap:plugin:helper' loaded \
+  || source $zap_HOME/plugins/helper/helper.plugin.zsh
 #endregion
 
 #region MARK LOADED
-zstyle ":zephyr:lib:bootstrap" loaded 'yes'
+zstyle ":zap:lib:bootstrap" loaded 'yes'
 #endregion

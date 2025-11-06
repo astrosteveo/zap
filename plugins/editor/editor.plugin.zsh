@@ -8,12 +8,12 @@
 # - https://github.com/sorin-ionescu/prezto/blob/master/modules/editor/init.zsh
 
 0=${(%):-%N}
-zstyle -t ':zephyr:lib:bootstrap' loaded || source ${0:a:h:h:h}/lib/bootstrap.zsh
+zstyle -t ':zap:lib:bootstrap' loaded || source ${0:a:h:h:h}/lib/bootstrap.zsh
 #endregion
 
 # Return if requirements are not met.
 [[ "$TERM" != 'dumb' ]] || return 1
-! zstyle -t ":zephyr:plugin:editor" skip || return 0
+! zstyle -t ":zap:plugin:editor" skip || return 0
 
 #
 # Options
@@ -28,7 +28,7 @@ setopt NO_flow_control         # Allow the usage of ^Q/^S in the context of zsh.
 #
 
 # Treat these characters as part of a word.
-zstyle -s ':zephyr:plugin:editor' wordchars 'WORDCHARS' || \
+zstyle -s ':zap:plugin:editor' wordchars 'WORDCHARS' || \
 WORDCHARS='*?_-.[]~&;!#$%^(){}<>'
 
 # Use human-friendly identifiers.
@@ -103,7 +103,7 @@ function update-cursor-style {
   local style
 
   # Try to get style for the current keymap, fallback to sensible defaults
-  zstyle -s ":zephyr:plugin:editor:$KEYMAP" cursor style
+  zstyle -s ":zap:plugin:editor:$KEYMAP" cursor style
   if [[ -z "$style" ]]; then
     case "$KEYMAP" in
       main|emacs|viins) style=line ;;
@@ -164,7 +164,7 @@ function dot-expansion {
     LBUFFER+='.'
   fi
 }
-zstyle -T ':zephyr:plugin:editor' 'dot-expansion' && zle -N dot-expansion
+zstyle -T ':zap:plugin:editor' 'dot-expansion' && zle -N dot-expansion
 
 # Inserts 'sudo ' at the beginning of the line.
 function prepend-sudo {
@@ -173,12 +173,12 @@ function prepend-sudo {
     (( CURSOR += 5 ))
   fi
 }
-zstyle -T ':zephyr:plugin:editor' 'prepend-sudo' && zle -N prepend-sudo
+zstyle -T ':zap:plugin:editor' 'prepend-sudo' && zle -N prepend-sudo
 
 # Expand aliases
 function glob-alias {
   local -a noexpand_aliases
-  zstyle -a ':zephyr:plugin:editor:glob-alias' 'noexpand' 'noexpand_aliases' \
+  zstyle -a ':zap:plugin:editor:glob-alias' 'noexpand' 'noexpand_aliases' \
     || noexpand_aliases=()
 
   # Get last word to the left of the cursor:
@@ -191,7 +191,7 @@ function glob-alias {
   fi
   zle self-insert
 }
-zstyle -T ':zephyr:plugin:editor' 'glob-alias' && zle -N glob-alias
+zstyle -T ':zap:plugin:editor' 'glob-alias' && zle -N glob-alias
 
 # Toggle the comment character at the start of the line. This is meant to work
 # around a buggy implementation of pound-insert in zsh.
@@ -212,7 +212,7 @@ function pound-toggle {
     (( CURSOR += 1 ))
   fi
 }
-zstyle -T ':zephyr:plugin:editor' 'pound-toggle' && zle -N pound-toggle
+zstyle -T ':zap:plugin:editor' 'pound-toggle' && zle -N pound-toggle
 
 # https://github.com/ohmyzsh/ohmyzsh/blob/master/plugins/fancy-ctrl-z/fancy-ctrl-z.plugin.zsh
 # https://sheerun.net/2014/03/21/how-to-boost-your-vim-productivity/
@@ -225,17 +225,17 @@ function symmetric-ctrl-z {
     zle clear-screen -w
   fi
 }
-zstyle -T ':zephyr:plugin:editor' 'symmetric-ctrl-z' && zle -N symmetric-ctrl-z
+zstyle -T ':zap:plugin:editor' 'symmetric-ctrl-z' && zle -N symmetric-ctrl-z
 
 # https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/magic-enter
 (( $+functions[magic-enter-cmd] )) ||
 function magic-enter-cmd {
   local cmd
-  zstyle -s ':zephyr:plugin:editor:magic-enter' command 'cmd' ||
+  zstyle -s ':zap:plugin:editor:magic-enter' command 'cmd' ||
     cmd="ls ."
 
   if command git rev-parse --is-inside-work-tree &>/dev/null; then
-    zstyle -s ':zephyr:plugin:editor:magic-enter' git-command 'cmd' ||
+    zstyle -s ':zap:plugin:editor:magic-enter' git-command 'cmd' ||
       cmd="git status -sb ."
   fi
   echo $cmd
@@ -250,7 +250,7 @@ function magic-enter {
   BUFFER=$(magic-enter-cmd)
 }
 
-if zstyle -T ':zephyr:plugin:editor' 'magic-enter'; then
+if zstyle -T ':zap:plugin:editor' 'magic-enter'; then
   # Wrapper for the accept-line zle widget (run when pressing Enter)
   # If the wrapper already exists don't redefine it
   if (( ! ${+functions[_magic-enter_accept-line]} )); then
@@ -334,13 +334,13 @@ done
 # Keybinds for emacs and vi insert mode
 for keymap in 'emacs' 'viins'; do
   # Expand .... to ../..
-  if zstyle -t ':zephyr:plugin:editor' dot-expansion; then
+  if zstyle -t ':zap:plugin:editor' dot-expansion; then
     bindkey -M "$keymap" "." expand-dot-to-parent-directory-path
   fi
 done
 
 # Do not expand .... to ../.. during incremental search.
-if zstyle -t ':zephyr:plugin:editor' dot-expansion; then
+if zstyle -t ':zap:plugin:editor' dot-expansion; then
   bindkey -M isearch . self-insert 2> /dev/null
 fi
 
@@ -350,7 +350,7 @@ bindkey -M emacs "$key_info[Escape];" pound-toggle
 bindkey -M vicmd "#" vi-pound-insert
 
 # Expand aliases
-if zstyle -t ':zephyr:plugin:editor' glob-alias; then
+if zstyle -t ':zap:plugin:editor' glob-alias; then
   # space expands all aliases, including global
   bindkey -M emacs " " glob-alias
   bindkey -M viins " " glob-alias
@@ -364,7 +364,7 @@ if zstyle -t ':zephyr:plugin:editor' glob-alias; then
 fi
 
 # ctrl-z sends things to the background - make it also bring to forground
-if zstyle -t ':zephyr:plugin:editor' 'symmetric-ctrl-z'; then
+if zstyle -t ':zap:plugin:editor' 'symmetric-ctrl-z'; then
   bindkey -M emacs '^Z' symmetric-ctrl-z
   bindkey -M viins '^Z' symmetric-ctrl-z
 fi
@@ -374,7 +374,7 @@ fi
 #
 
 # Set the key layout.
-zstyle -s ':zephyr:plugin:editor' key-bindings 'key_bindings'
+zstyle -s ':zap:plugin:editor' key-bindings 'key_bindings'
 if [[ "$key_bindings" == (emacs|) ]]; then
   bindkey -e
 elif [[ "$key_bindings" == vi ]]; then
@@ -386,5 +386,5 @@ fi
 unset bind key{,_bindings} {vicmd,viins,global}_keybinds
 
 #region MARK LOADED
-zstyle ':zephyr:plugin:editor' loaded 'yes'
+zstyle ':zap:plugin:editor' loaded 'yes'
 #endregion

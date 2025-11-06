@@ -48,10 +48,10 @@ This plugin allows for the following customizations:
 
 To cache the results of the `dircolors` call, you can set:
 
-`zstyle ':zephyr:plugin:color' 'use-cache' 'yes'`
+`zstyle ':zap:plugin:color' 'use-cache' 'yes'`
 
 To always use caching to speed up expensive calls, you can set:
 
-`zstyle ':zephyr:plugin:*' 'use-cache' 'yes'`
+`zstyle ':zap:plugin:*' 'use-cache' 'yes'`
 
 [colors]: https://zsh.sourceforge.io/Doc/Release/User-Contributions.html#index-colors

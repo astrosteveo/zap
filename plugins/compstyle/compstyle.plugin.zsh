@@ -7,24 +7,24 @@
 # - https://github.com/zsh-users/zsh/blob/master/Functions/Prompts/promptinit
 
 0=${(%):-%N}
-zstyle -t ':zephyr:lib:bootstrap'    loaded || source ${0:a:h:h:h}/lib/bootstrap.zsh
-zstyle -t ':zephyr:plugin:compstyle' loaded && return 1
+zstyle -t ':zap:lib:bootstrap'    loaded || source ${0:a:h:h:h}/lib/bootstrap.zsh
+zstyle -t ':zap:plugin:compstyle' loaded && return 1
 #endregion
 
 # Return if requirements are not met.
 [[ "$TERM" != 'dumb' ]] || return 1
-! zstyle -t ":zephyr:plugin:compstyle" skip || return 0
+! zstyle -t ":zap:plugin:compstyle" skip || return 0
 
-function compstyle_zephyr_help {
+function compstyle_zap_help {
   echo "A composite of the grml, prezto, and ohmyzsh completions."
   echo "You can invoke it with the following command:"
   echo
-  echo "  compstyle zephyr"
+  echo "  compstyle zap"
   echo
-  echo "More information available at: https://github.com/mattmc3/zephyr"
+  echo "More information available at: https://github.com/astrosteveo/zap"
 }
 
-function compstyle_zephyr_setup {
+function compstyle_zap_setup {
   # Pre-reqs.
   : ${__zsh_cache_dir:=${XDG_CACHE_HOME:-$HOME/.cache}/zsh}
   [[ -d $__zsh_cache_dir ]] || mkdir -p $__zsh_cache_dir
@@ -41,7 +41,7 @@ function compstyle_zephyr_setup {
   zstyle ':completion::complete:*' cache-path "$__zsh_cache_dir/zcompcache"
 
   # Case-insensitive (all), partial-word, and then substring completion.
-  if zstyle -t ':zephyr:plugin:compstyle:*' case-sensitive; then
+  if zstyle -t ':zap:plugin:compstyle:*' case-sensitive; then
     zstyle ':completion:*' matcher-list 'r:|=*' 'l:|=* r:|=*'
     setopt case_glob
   else
@@ -95,7 +95,7 @@ function compstyle_zephyr_setup {
 
   # Populate hostname completion. But allow ignoring custom entries from static
   # */etc/hosts* which might be uninteresting.
-  zstyle -a ':zephyr:plugin:compstyle:*:hosts' etc-host-ignores '_etc_host_ignores'
+  zstyle -a ':zap:plugin:compstyle:*:hosts' etc-host-ignores '_etc_host_ignores'
 
   zstyle -e ':completion:*:hosts' hosts 'reply=(
     ${=${=${=${${(f)"$(cat {/etc/ssh/ssh_,~/.ssh/}known_hosts(|2)(N) 2> /dev/null)"}%%[#| ]*}//\]:[0-9]*/ }//,/ }//\[/ }
@@ -158,7 +158,7 @@ function compstyle_zephyr_setup {
 function compstyleinit {
   typeset -gaU completion_styles
   typeset -ga completion_style
-  completion_styles=(zephyr)
+  completion_styles=(zap)
 
   function compstyleinit {
     emulate -L zsh; setopt extendedglob
@@ -249,5 +249,5 @@ function compstyleinit {
 }
 
 #region MARK LOADED
-zstyle ':zephyr:plugin:compstyle' loaded 'yes'
+zstyle ':zap:plugin:compstyle' loaded 'yes'
 #endregion

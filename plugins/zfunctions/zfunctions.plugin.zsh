@@ -4,11 +4,11 @@
 #
 
 0=${(%):-%N}
-zstyle -t ':zephyr:lib:bootstrap' loaded || source ${0:a:h:h:h}/lib/bootstrap.zsh
+zstyle -t ':zap:lib:bootstrap' loaded || source ${0:a:h:h:h}/lib/bootstrap.zsh
 #endregion
 
 # Return if requirements are not met.
-! zstyle -t ":zephyr:plugin:zfunctions" skip || return 0
+! zstyle -t ":zap:plugin:zfunctions" skip || return 0
 
 ##? autoload-dir - Autoload function files in directory
 function autoload-dir {
@@ -98,7 +98,7 @@ function funcfresh {
 
 # Set ZFUNCDIR.
 if [[ -z "$ZFUNCDIR" ]]; then
-  zstyle -s ':zephyr:plugin:zfunctions' directory 'ZFUNCDIR' \
+  zstyle -s ':zap:plugin:zfunctions' directory 'ZFUNCDIR' \
   || ZFUNCDIR="$__zsh_config_dir/functions"
   ZFUNCDIR="${~ZFUNCDIR}"
 fi
@@ -109,5 +109,5 @@ if [[ -d "${ZFUNCDIR:A}" ]]; then
 fi
 
 #region MARK LOADED
-zstyle ":zephyr:plugin:zfunctions" loaded 'yes'
+zstyle ":zap:plugin:zfunctions" loaded 'yes'
 #endregion

@@ -6,7 +6,7 @@
 
 # Return if requirements are not met.
 [[ "$TERM" != 'dumb' ]] || return 1
-! zstyle -t ":zephyr:plugin:directory" skip || return 0
+! zstyle -t ":zap:plugin:directory" skip || return 0
 
 # Set Zsh options related to directories, globbing, and I/O.
 setopt auto_pushd         # Make cd push the old directory onto the dirstack.
@@ -20,7 +20,7 @@ setopt NO_clobber         # Don't overwrite files with >. Use >| to bypass.
 setopt NO_rm_star_silent  # Ask for confirmation for `rm *' or `rm path/*'
 
 # Set directory aliases.
-if ! zstyle -t ':zephyr:plugin:directory:alias' skip; then
+if ! zstyle -t ':zap:plugin:directory:alias' skip; then
   alias -- -='cd -'
   alias dirh='dirs -v'
 
@@ -48,5 +48,5 @@ function up {
 }
 
 #region MARK LOADED
-zstyle ':zephyr:plugin:directory' loaded 'yes'
+zstyle ':zap:plugin:directory' loaded 'yes'
 #endregion

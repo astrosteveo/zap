@@ -11,7 +11,7 @@ Init
 Test plugin is not initialized
 
 ```zsh
-% zstyle -t ':zephyr:plugin:editor' loaded || echo "not loaded"
+% zstyle -t ':zap:plugin:editor' loaded || echo "not loaded"
 not loaded
 % test $+functions[bindkey-all] = 0  #=> --exit 0
 % test -v key_info #=> --exit 1
@@ -24,14 +24,14 @@ norcs
 Initialize plugin
 
 ```zsh
-% source $ZEPHYR_HOME/plugins/editor/editor.plugin.zsh; setopt clobber
+% source $zap_HOME/plugins/editor/editor.plugin.zsh; setopt clobber
 %
 ```
 
 Test plugin is initialized
 
 ```zsh
-% zstyle -t ':zephyr:plugin:editor' loaded || echo "not loaded"
+% zstyle -t ':zap:plugin:editor' loaded || echo "not loaded"
 % test $+functions[bindkey-all] = 1  #=> --exit 0
 % test -v key_info #=> --exit 0
 % set -o | grep 'on$' | sort

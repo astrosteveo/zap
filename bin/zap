@@ -1,12 +1,12 @@
 #!/bin/sh
-##? usage: zephyr <command>
-# To check, run: shellcheck -e SC3043 -e SC2016 ./zephyr
+##? usage: zap <command>
+# To check, run: shellcheck -e SC3043 -e SC2016 ./zap
 
 # Zsh can be POSIX too... with help.
 [ -n "$ZSH_VERSION" ] && setopt POSIX_ARGZERO
 
 # THIS_SCRIPT="$(realpath "$0")"
-ZEPHYR_HOME="$(realpath "$0"/../..)"
+zap_HOME="$(realpath "$0"/../..)"
 
 # POSIX test for function existance.
 is_function() {
@@ -16,7 +16,7 @@ is_function() {
 
 ##? commands:
 ##?   help    Display this help
-zephyr_help() {
+zap_help() {
   # echo "$0"
   grep "^##?" "$0" | cut -c 5-
 }
@@ -57,12 +57,12 @@ print_end_region() {
   echo "#endregion"
 }
 
-##?   bulid1  Build the .zephyr1 file
-zephyr_build1() {
+##?   bulid1  Build the .zap1 file
+zap_build1() {
   local filter_regions squish_newlines anon_func_wrapper noop
-  local tmpfile zephyr1_file plugin plugin_file
-  tmpfile=$ZEPHYR_HOME/lib/.zephyr1.tmp
-  zephyr1_file="$ZEPHYR_HOME/lib/.zephyr1"
+  local tmpfile zap1_file plugin plugin_file
+  tmpfile=$zap_HOME/lib/.zap1.tmp
+  zap1_file="$zap_HOME/lib/.zap1"
 
   noop='{print $0}'
 
@@ -90,15 +90,15 @@ zephyr_build1() {
   {
     echo "#!/bin/zsh"
     echo "# .zshrc1"
-    echo "# > First things first - start your .zshrc off right with Zephyr lite"
-    echo "# Project Home: https://github.com/mattmc3/zephyr"
+    echo "# > First things first - start your .zshrc off right with zap lite"
+    echo "# Project Home: https://github.com/astrosteveo/zap"
     echo
 
     print_start_region "bootstrap"
-    awk "$filter_regions" "$ZEPHYR_HOME/lib/bootstrap.zsh"
+    awk "$filter_regions" "$zap_HOME/lib/bootstrap.zsh"
     print_end_region
     print_start_region "helper"
-    awk "$filter_regions" "$ZEPHYR_HOME/plugins/helper/helper.plugin.zsh"
+    awk "$filter_regions" "$zap_HOME/plugins/helper/helper.plugin.zsh"
     print_end_region
   } > "$tmpfile"
 
@@ -106,7 +106,7 @@ zephyr_build1() {
     environment homebrew history directory color editor utility zfunctions \
     prompt compstyle completion confd
   do
-    plugin_file="$ZEPHYR_HOME/plugins/${plugin}/${plugin}.plugin.zsh"
+    plugin_file="$zap_HOME/plugins/${plugin}/${plugin}.plugin.zsh"
     {
       print_start_region "$plugin"
       outfilter=$noop
@@ -122,19 +122,19 @@ zephyr_build1() {
     awk "$squish_newlines" "$tmpfile"
     echo
     echo "# vim: ft=zsh sw=2 ts=2 et"
-  } > "$zephyr1_file"
+  } > "$zap1_file"
 
   # Cleanup
   rm -f -- "$tmpfile"
 }
 
-# main zephyr command
-zephyr() {
+# main zap command
+zap() {
   local subcmd
   if [ "$#" -eq 0 ]; then
-    echo >&2 "zephyr: expecting a subcommand."
+    echo >&2 "zap: expecting a subcommand."
     echo
-    zephyr_help
+    zap_help
     return 1
   fi
 
@@ -148,14 +148,14 @@ zephyr() {
   fi
 
   # Call the subcommand if it exists.
-  if is_function "zephyr_${subcmd}"; then
+  if is_function "zap_${subcmd}"; then
     shift
-    "zephyr_${subcmd}" "$@"
+    "zap_${subcmd}" "$@"
   else
-    echo >&2 "zephyr: subcommand not found '$subcmd'."
+    echo >&2 "zap: subcommand not found '$subcmd'."
     return 1
   fi
 }
-zephyr "$@"
+zap "$@"
 
 # vim: set sw=2 sts=2 ts=8 et:

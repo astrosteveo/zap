@@ -20,7 +20,7 @@ autoload-dir not defined
 Initialize plugin
 
 ```zsh
-% source $ZEPHYR_HOME/plugins/zfunctions/zfunctions.plugin.zsh
+% source $zap_HOME/plugins/zfunctions/zfunctions.plugin.zsh
 %
 ```
 

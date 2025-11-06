@@ -9,7 +9,7 @@ Here we need to handle test setup.
 ```zsh
 % source ./tests/__init__.zsh
 % t_setup
-% zstyle ':zephyr:plugin:confd' immediate 'yes'
+% zstyle ':zap:plugin:confd' immediate 'yes'
 %
 ```
 
@@ -50,7 +50,7 @@ Test selection of dirs from `$HOME`.
 Setup:
 
 ```zsh
-% zstyle ':zephyr:plugin:confd' directory $HOME/.myrc.d
+% zstyle ':zap:plugin:confd' directory $HOME/.myrc.d
 % ZDOTDIR=$HOME/.zsh
 % rcdirs=($HOME/.myrc.d $HOME/.zshrc.d)
 % rcdirs+=($ZDOTDIR/rc.d $ZDOTDIR/conf.d $ZDOTDIR/zshrc.d $ZDOTDIR/.zshrc.d)
@@ -68,7 +68,7 @@ mock sourcing file... $HOME/.myrc.d/rcfile.zsh
 % rm -rf -- $HOME/.myrc.d
 % # Now that the zstyle dir is missing, it should fail if the var is still set
 % . $PWD/plugins/confd/confd.plugin.zsh #=> --exit 1
-% zstyle -e ':zephyr:plugin:confd' directory
+% zstyle -e ':zap:plugin:confd' directory
 %
 ```
 

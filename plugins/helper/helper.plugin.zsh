@@ -1,6 +1,6 @@
 #region HEADER
 #
-# helper: Common variables and functions used by Zephyr plugins.
+# helper: Common variables and functions used by zap plugins.
 #
 #endregion
 
@@ -63,5 +63,5 @@ function is-tmux {
 }
 
 #region MARK LOADED
-zstyle ':zephyr:plugin:helper' loaded 'yes'
+zstyle ':zap:plugin:helper' loaded 'yes'
 #endregion

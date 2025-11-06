@@ -6,7 +6,7 @@
 
 # Return if requirements are not met.
 [[ "$TERM" != 'dumb' ]] || return 1
-! zstyle -t ":zephyr:plugin:color" skip || return 0
+! zstyle -t ":zap:plugin:color" skip || return 0
 
 # Built-in zsh colors.
 autoload -Uz colors && colors
@@ -26,7 +26,7 @@ if [[ -z "$LS_COLORS" ]]; then
     $commands[dircolors](N) $commands[gdircolors](N)
   )
   if (( $#_dircolors_cmds )); then
-    if zstyle -t ':zephyr:plugin:color' 'use-cache'; then
+    if zstyle -t ':zap:plugin:color' 'use-cache'; then
       cached-eval "${_dircolors_cmds[1]:t}" "$_dircolors_cmds[1]" --sh
     else
       source <("$_dircolors_cmds[1]" --sh)
@@ -46,7 +46,7 @@ if (( ! $+commands[dircolors] )); then
 fi
 
 # Set aliases.
-if ! zstyle -t ':zephyr:plugin:color:alias' skip; then
+if ! zstyle -t ':zap:plugin:color:alias' skip; then
   # Print a simple colormap.
   alias colormap='for i in {0..255}; do print -Pn "%K{$i}  %k%F{$i}${(l:3::0:)i}%f " ${${(M)$((i%6)):#3}:+"\n"}; done'
 
@@ -69,5 +69,5 @@ fi
 zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 
 #region MARK LOADED
-zstyle ':zephyr:plugin:color' loaded 'yes'
+zstyle ':zap:plugin:color' loaded 'yes'
 #endregion

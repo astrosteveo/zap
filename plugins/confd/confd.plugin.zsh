@@ -4,16 +4,16 @@
 #
 
 0=${(%):-%N}
-zstyle -t ':zephyr:lib:bootstrap' loaded || source ${0:a:h:h:h}/lib/bootstrap.zsh
+zstyle -t ':zap:lib:bootstrap' loaded || source ${0:a:h:h:h}/lib/bootstrap.zsh
 #endregion
 
 # Return if requirements are not met.
-! zstyle -t ":zephyr:plugin:confd" skip || return 0
+! zstyle -t ":zap:plugin:confd" skip || return 0
 
 function run_confd {
   # Find the conf.d directory.
   local confd user_confd
-  zstyle -a ':zephyr:plugin:confd' directory 'user_confd'
+  zstyle -a ':zap:plugin:confd' directory 'user_confd'
   local -a confd_choices=(
     ${~user_confd}
     $__zsh_config_dir/conf.d(N)
@@ -42,12 +42,12 @@ function run_confd {
 
 # Allow the user to bypass the confd deferral and run it immediately. Otherwise, we
 # hook run_confd to the custom post_zshrc event.
-if zstyle -t ':zephyr:plugin:confd' immediate; then
+if zstyle -t ':zap:plugin:confd' immediate; then
   run_confd || return 1
 else
   post_zshrc_hook+=(run_confd)
 fi
 
 #region MARK LOADED
-zstyle ':zephyr:plugin:confd' loaded 'yes'
+zstyle ':zap:plugin:confd' loaded 'yes'
 #endregion

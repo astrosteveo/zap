@@ -20,7 +20,7 @@ Test plugin is not initialized
 Initialize plugin
 
 ```zsh
-% source $ZEPHYR_HOME/plugins/color/color.plugin.zsh
+% source $zap_HOME/plugins/color/color.plugin.zsh
 %
 ```
 

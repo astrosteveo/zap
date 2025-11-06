@@ -8,11 +8,11 @@
 # - https://github.com/sorin-ionescu/prezto/blob/master/runcoms/zprofile
 
 0=${(%):-%N}
-zstyle -t ':zephyr:lib:bootstrap' loaded || source ${0:a:h:h:h}/lib/bootstrap.zsh
+zstyle -t ':zap:lib:bootstrap' loaded || source ${0:a:h:h:h}/lib/bootstrap.zsh
 #endregion
 
 # Return if requirements are not met.
-! zstyle -t ":zephyr:plugin:environment" skip || return 0
+! zstyle -t ":zap:plugin:environment" skip || return 0
 
 # Set Zsh options related to globbing.
 setopt extended_glob         # Use more awesome globbing features.
@@ -35,7 +35,7 @@ setopt NO_hup                # Don't kill jobs on shell exit.
 
 # Set XDG base dirs.
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
-if zstyle -T ':zephyr:plugin:environment' use-xdg-basedirs; then
+if zstyle -T ':zap:plugin:environment' use-xdg-basedirs; then
   export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
   export XDG_CACHE_HOME=${XDG_CACHE_HOME:-$HOME/.cache}
   export XDG_DATA_HOME=${XDG_DATA_HOME:-$HOME/.local/share}
@@ -90,7 +90,7 @@ path=(/usr/local/{,s}bin(N) $path)
 if [[ ! -v prepath ]]; then
   typeset -ga prepath
   # If path ever gets out of order, you can use `path=($prepath $path)` to reset it.
-  zstyle -a ':zephyr:plugin:environment' 'prepath' 'prepath' \
+  zstyle -a ':zap:plugin:environment' 'prepath' 'prepath' \
   || prepath=(
     $HOME/{,s}bin(N)
     $HOME/.local/{,s}bin(N)
@@ -104,5 +104,5 @@ path=(
 )
 
 #region MARK LOADED
-zstyle ':zephyr:plugin:environment' loaded 'yes'
+zstyle ':zap:plugin:environment' loaded 'yes'
 #endregion

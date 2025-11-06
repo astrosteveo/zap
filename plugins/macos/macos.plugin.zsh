@@ -10,7 +10,7 @@
 
 # Return if requirements are not met.
 [[ "$OSTYPE" == darwin* ]] || return 1
-! zstyle -t ":zephyr:plugin:macos" skip || return 0
+! zstyle -t ":zap:plugin:macos" skip || return 0
 
 # Load plugin functions.
 0=${(%):-%N}
@@ -18,5 +18,5 @@ fpath=(${0:a:h}/functions $fpath)
 autoload -Uz ${0:a:h}/functions/*(.:t)
 
 #region MARK LOADED
-zstyle ':zephyr:plugin:macos' loaded 'yes'
+zstyle ':zap:plugin:macos' loaded 'yes'
 #endregion

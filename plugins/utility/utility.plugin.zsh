@@ -10,7 +10,7 @@
 
 # Return if requirements are not met.
 [[ "$TERM" != 'dumb' ]] || return 1
-! zstyle -t ":zephyr:plugin:utility" skip || return 0
+! zstyle -t ":zap:plugin:utility" skip || return 0
 
 # Use built-in paste magic.
 autoload -Uz bracketed-paste-url-magic
@@ -88,5 +88,5 @@ function sedi {
 }
 
 #region MARK LOADED
-zstyle ':zephyr:plugin:utility' loaded 'yes'
+zstyle ':zap:plugin:utility' loaded 'yes'
 #endregion

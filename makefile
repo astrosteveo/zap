@@ -1,4 +1,4 @@
-##? zephyr - A Zsh framework as nice as a cool summer breeze
+##? zap - A Zsh framework as nice as a cool summer breeze
 ##?
 ##?	Usage: make <command>
 ##?

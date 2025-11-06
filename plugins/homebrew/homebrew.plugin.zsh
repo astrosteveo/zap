@@ -8,11 +8,11 @@
 # - https://github.com/sorin-ionescu/prezto/tree/master/modules/homebrew
 
 0=${(%):-%N}
-zstyle -t ':zephyr:lib:bootstrap' loaded || source ${0:a:h:h:h}/lib/bootstrap.zsh
+zstyle -t ':zap:lib:bootstrap' loaded || source ${0:a:h:h:h}/lib/bootstrap.zsh
 #endregion
 
 # Return if requirements are not met.
-! zstyle -t ":zephyr:plugin:homebrew" skip || return 0
+! zstyle -t ":zap:plugin:homebrew" skip || return 0
 
 # Where is brew?
 # Setup homebrew if it exists on the system.
@@ -27,7 +27,7 @@ typeset -aU _brewcmd=(
 (( ${#_brewcmd} )) || return 1
 
 # brew shellenv
-if zstyle -t ':zephyr:plugin:homebrew' 'use-cache'; then
+if zstyle -t ':zap:plugin:homebrew' 'use-cache'; then
   cached-eval 'brew_shellenv' $_brewcmd[1] shellenv
 else
   source <($_brewcmd[1] shellenv)
@@ -46,7 +46,7 @@ if [[ -d "$HOMEBREW_PREFIX/share/zsh/site-functions" ]]; then
 fi
 
 # Add keg-only completions to fpath
-zstyle -a ':zephyr:plugin:homebrew' 'keg-only-brews' '_kegonly' \
+zstyle -a ':zap:plugin:homebrew' 'keg-only-brews' '_kegonly' \
   || _kegonly=(curl ruby sqlite)
 for _keg in $_kegonly; do
   fpath=($HOMEBREW_PREFIX/opt/${_keg}/share/zsh/site-functions(/N) $fpath)
@@ -54,7 +54,7 @@ done
 unset _keg{,only}
 
 # Set aliases.
-if ! zstyle -t ':zephyr:plugin:homebrew:alias' skip; then
+if ! zstyle -t ':zap:plugin:homebrew:alias' skip; then
   alias brewup="brew update && brew upgrade && brew cleanup"
   alias brewinfo="brew leaves | xargs brew desc --eval-all"
 
@@ -83,5 +83,5 @@ if ! zstyle -t ':zephyr:plugin:homebrew:alias' skip; then
 fi
 
 #region MARK LOADED
-zstyle ':zephyr:plugin:homebrew' loaded 'yes'
+zstyle ':zap:plugin:homebrew' loaded 'yes'
 #endregion

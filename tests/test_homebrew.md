@@ -11,7 +11,7 @@ Init
 Test plugin is not initialized
 
 ```zsh
-% zstyle -t ':zephyr:plugin:homebrew' loaded || echo "not loaded"
+% zstyle -t ':zap:plugin:homebrew' loaded || echo "not loaded"
 not loaded
 % test $+aliases[brewup] = 0  #=> --exit 0
 % test $+aliases[brewinfo] = 0  #=> --exit 0
@@ -25,14 +25,14 @@ norcs
 Initialize plugin
 
 ```zsh
-% source $ZEPHYR_HOME/plugins/homebrew/homebrew.plugin.zsh; setopt clobber
+% source $zap_HOME/plugins/homebrew/homebrew.plugin.zsh; setopt clobber
 %
 ```
 
 Test plugin is initialized
 
 ```zsh
-% zstyle -t ':zephyr:plugin:homebrew' loaded || echo "not loaded"
+% zstyle -t ':zap:plugin:homebrew' loaded || echo "not loaded"
 % test $+aliases[brewup] = 1  #=> --exit 0
 % test $+aliases[brewinfo] = 1  #=> --exit 0
 % test $+aliases[brewdeps] = 1  #=> --exit 0

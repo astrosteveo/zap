@@ -11,7 +11,7 @@ Init
 Test plugin is not initialized
 
 ```zsh
-% zstyle -t ':zephyr:plugin:directory' loaded || echo "not loaded"
+% zstyle -t ':zap:plugin:directory' loaded || echo "not loaded"
 not loaded
 % test $+functions[up] = 0  #=> --exit 0
 % test $+aliases[dirh] = 0  #=> --exit 0
@@ -24,14 +24,14 @@ norcs
 Initialize plugin
 
 ```zsh
-% source $ZEPHYR_HOME/plugins/directory/directory.plugin.zsh; setopt clobber
+% source $zap_HOME/plugins/directory/directory.plugin.zsh; setopt clobber
 %
 ```
 
 Test plugin is initialized
 
 ```zsh
-% zstyle -t ':zephyr:plugin:directory' loaded || echo "not loaded"
+% zstyle -t ':zap:plugin:directory' loaded || echo "not loaded"
 % test $+functions[up] = 1  #=> --exit 0
 % test $+aliases[dirh] = 1  #=> --exit 0
 % set -o | grep 'on$' | sort
