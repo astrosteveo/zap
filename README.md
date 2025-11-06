@@ -1,19 +1,77 @@
-# :wind_face: zap
+# zap
 
-> A Zsh framework as nice as a cool summer breeze
+> A modern, minimal Zsh framework
 
-Zsh is a wonderful shell, but out-of-the-box it needs a boost. That's where zap comes
-in.
+Zsh is a wonderful shell that is unfortunately overlooked due to its cryptic state with the out of the box experience (OOBE).
+
+## What is a shell?
+
+Before you can determine if Zsh is right for you first you must understand what a shell is, what one isn't, and why you should care if you use `zsh` or any other shell such as `ksh`, `fish`, `bash`.
+
+> [!INFO]
+> Apple made the switch to zsh in macos starting with `macOS Catalina` in 2019.
+
+### Simple Analogy
+
+Picture your computer as a library, and the files and directories are the various sections and programs are books on the shelf. At the library when you want a specific book you can request it from a librarian who will assist you with locating that book.
+
+Computer shells do the same thing. You want to perform an action such as printing text to the screen with the `echo` command. Instead of giving you direct access to the kernel, an API is exposed that the shell interfaces with that takes your abstract commands and translates them into system calls that the kernel executes, and then returns a response back to the user, allowing the user to see the output on the terminal.
+
+> A computer shell is simply a program that makes API calls to the kernel. Nothing more. Nothing less. It acts as an intermediary between the user and the kernel.
+
+## What's a Terminal Then?
+
+A terminal, also known as a `terminal emulator`, is a text-based interface for users to interact with the operating system through system calls that the shell makes through the API exposed by the kernel. Terminal and shell are often interchangably used but they serve entirely different roles.
+
+If the shell makes API calls to the kernel's API, then the terminal draws the output on the screen. Terminals are programs such as `Gnome Terminal`, `Konsole`, `Alacritty`, `Kitty`, and `Wezterm` to name the most popular ones. If you're on macOS, then `iTerm2` likely resonates with you, as it is the terminal emulator that ships by default with modern versions of macOS.
+
+## Why Zsh?
+
+Some distinguishing features of Zsh compared to other shells like Bash or Fish include:
+
+### Advanced Globbing
+
+Zsh provides comprehensive options for pattern matching and file selection, such as recursive globbing with `**`.
+
+### Customization
+
+Zsh is highly configurable with hooks, themes, and modules, making it suitable for both casual users and power users.
+
+### Programmable Autocompletion
+
+With granular control over autocomplete rules, Zsh allows enhanced customization for completing commands, arguments, and paths.
+
+By abstracting complex system-level operations into a user-friendly interface, the shell becomes an essential tool for interacting with Unix-like systems.
+
+In computing, the shell is a program that helps you interact with your computer by typing commands. It's like a translator between you and the computer's inner workings. Zsh is one type of shell, and it's designed to be efficient, customizable, and make your work easier.
+
+Zsh is
+
+## Where does zap's role come in?
 
 zap combines some of the best parts from [Prezto][prezto] and other Zsh frameworks,
 removes bloat and dependencies, and prioritizes speed and simplicity.
 
+The goal is to give a baseline to start from that has sane defaults such as:
+
+- Keybinds
+- Completion
+- History
+- Prompting
+
+
 zap can be thought of as a fast, lightweight set of independent Zsh features, and is
 designed to be one of the first things you load to build your ideal Zsh config.
 
-Combine zap with a [plugin manager][antidote] and some [awesome
+Combine zap with a plugin manager, or even manually source them yourself in your `${HOME}/.zshrc` and some [awesome
 plugins](https://github.com/unixorn/awesome-zsh-plugins) and you'll have a powerful Zsh
 setup that rivals anything out there.
+
+- No updates. Aside from bug fixes and feature requests, you never have to worry about your plugin manager being updated. zap works by simply:
+
+1. Cloning the plugin repo.
+2. Installing the plugin.
+3. Loading the plugin.
 
 ## Project goals
 
@@ -32,30 +90,6 @@ zap comes with an (optional) [Starship][starship] prompt config.
 ![zap Prompt][terminal-img]
 
 ## Install
-
-### Using a Plugin manager
-
-If your plugin manager supports using sub-plugins, you can load zap that way as well.
-
-[Antidote][antidote] is one such plugin manager. You can load only the parts of zap you need like so:
-
-```shell
-# .zsh_plugins.txt
-# pick only the plugins you want and remove the rest
-astrosteveo/zap path:plugins/color
-astrosteveo/zap path:plugins/completion
-astrosteveo/zap path:plugins/compstyle
-astrosteveo/zap path:plugins/confd
-astrosteveo/zap path:plugins/directory
-astrosteveo/zap path:plugins/editor
-astrosteveo/zap path:plugins/environment
-astrosteveo/zap path:plugins/history
-astrosteveo/zap path:plugins/homebrew
-astrosteveo/zap path:plugins/macos
-astrosteveo/zap path:plugins/prompt
-astrosteveo/zap path:plugins/utility
-astrosteveo/zap path:plugins/zfunctions
-```
 
 ### Manually
 
@@ -159,26 +193,11 @@ Change the zfunctions directory:
 ':zap:plugin:zfunctions' directory ${HOME:-$ZDOTDIR}/.zfuncs
 ```
 
-## Why don't you include...
-
-_Q: Why don't you include programming language plugins (eg: Python, Ruby)?_ \
-**A:** These kinds of plugins can be very opinionated, and are in need of lots of upkeep
-from maintainers that use those languages. Language plugins are already available via
-Oh-My-Zsh and Prezto, and can always be installed with [a plugin manager that supports
-subplugins][antidote].
-
-_Q: Why don't you also include popular plugins the way Prezto does (eg:
-zsh-autosuggestions, zsh-history-substring-search)?_ \
-**A:** These kinds of utilities are already
-available as standalone plugins. zap aims to include only core Zsh functionality that
-you can't already easily get via a [plugin manager][antidote], with a few exceptions for
-convenience. I have experimented with including submodules similar to Prezto, but was
-not happy with the result. Simpler is better.
-
 ## Credits
 
 zap is a derivative work of the following great projects:
 
+- [Zephyr][zephyr] - [MIT License][zephyr-license]
 - [Prezto][prezto] - [MIT License][prezto-license]
 - [zsh-utils][zsh-utils] - [MIT License][zsh-utils-license]
 - [Oh-My-Zsh][ohmyzsh] - [MIT License][ohmyzsh-license]
@@ -193,3 +212,5 @@ zap is a derivative work of the following great projects:
 [terminal-img]: https://raw.githubusercontent.com/astrosteveo/zap/resources/img/terminal.png
 [starship]: https://starship.rs
 [xdg-base-dirs]: https://specifications.freedesktop.org/basedir-spec/latest/
+[zephyr]: https://github.com/mattmc3/zephyr
+[zephyr-license]: https://github.com/mattmc3/zephyr/blob/main/LICENSE
