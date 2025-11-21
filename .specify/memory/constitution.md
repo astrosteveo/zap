@@ -1,50 +1,55 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!-- Sync Impact Report
+Version: old -> 1.0.0
+List of modified principles:
+- [PRINCIPLE_1_NAME] -> I. Library-First
+- [PRINCIPLE_2_NAME] -> II. Interface-Driven
+- [PRINCIPLE_3_NAME] -> III. Test-First
+- [PRINCIPLE_4_NAME] -> IV. Spec-Driven
+- [PRINCIPLE_5_NAME] -> V. Atomic Delivery
+Added sections:
+- System Standards
+- Contribution Workflow
+Templates requiring updates: None
+-->
+# Zap Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Library-First
+Every feature starts as a standalone library. Libraries must be self-contained, independently testable, and documented. Clear purpose is required - no organizational-only libraries.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Interface-Driven
+Every library exposes functionality via clear interfaces (CLI or API). Text in/out protocol is preferred for CLI tools: stdin/args → stdout, errors → stderr. Support JSON + human-readable formats.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Test-First
+Test-Driven Development (TDD) is standard. Tests are written and fail before implementation begins. The Red-Green-Refactor cycle is strictly enforced for all core logic.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Spec-Driven
+No code is written without a plan. Changes originate from a specification or issue. Documentation (specs) precedes implementation.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Atomic Delivery
+User stories and tasks must be independently testable and deliverable. Big bang releases are avoided in favor of incremental, verifiable value.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## System Standards
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### Operational Constraints
+- **Security**: No secrets in code. Principle of least privilege.
+- **Performance**: Measure before optimizing. Define clear SLAs.
+- **Documentation**: Required for all public APIs and modules.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+## Contribution Workflow
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### Quality Gates
+- **Code Review**: All changes require peer review or self-review against this constitution.
+- **Testing**: CI must pass before merge. Coverage should not decrease.
+- **Commits**: Use conventional commits (feat, fix, docs, etc.).
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+### Amendments
+This constitution supersedes all other practices. Amendments require documentation, approval by the project owner, and a clear migration plan if retroactive.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+### Compliance
+All PRs and reviews must verify compliance with these principles. Deviations must be explicitly justified in the PR description or Plan. Complexity must be justified.
+
+**Version**: 1.0.0 | **Ratified**: 2025-11-20 | **Last Amended**: 2025-11-20
