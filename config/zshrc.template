@@ -1,0 +1,186 @@
+# Zsh Configuration File
+#
+# This file was created by the Zap plugin manager installer.
+# Zap provides an Oh-My-Zsh-level experience out of the box with zero configuration.
+#
+# For advanced customization, see ~/.zaprc (run: cp ~/.zap/config/zaprc.template ~/.zaprc)
+
+# === Powerlevel10k Instant Prompt (Optional) ===
+#
+# IMPORTANT: This MUST be at the top if using Powerlevel10k!
+# Uncomment these lines if you're using romkatv/powerlevel10k:
+#
+# if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+#   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+# fi
+
+# === Zap Configuration (via zstyle) ===
+#
+# Customize Zap behavior using zstyles. Set these BEFORE sourcing zap.zsh.
+# For more options, see ~/.zap/config/zaprc.template or create ~/.zaprc
+#
+# Disable features:
+# zstyle ':zap:prompt' enable 'no'              # Don't load built-in prompt (use Starship, Powerlevel10k)
+# zstyle ':zap:terminal' title 'no'             # Don't set terminal titles
+# zstyle ':zap:completion' security-check 'no'  # Skip completion security check (not recommended)
+#
+# Enable features:
+# zstyle ':zap:history' share 'yes'             # Share history across all sessions (default: no)
+#
+# Customize prompt:
+# zstyle ':zap:prompt' symbol '➜'               # Custom prompt symbol (default: ❯)
+# zstyle ':zap:prompt' show-user 'always'       # Always show user@host (default: auto)
+#
+# Customize history:
+# zstyle ':zap:history' size '100000'           # History size (default: 50000)
+# zstyle ':zap:history' file '~/.zsh_history'   # Custom history file
+
+# === Plugin Configuration (Set Before Loading) ===
+#
+# Configure plugin behavior BEFORE they load:
+#
+# zsh-autosuggestions:
+# export ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+# export ZSH_AUTOSUGGEST_USE_ASYNC=1
+# export ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+#
+# zsh-syntax-highlighting:
+# export ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern)
+#
+# fzf:
+# export FZF_DEFAULT_OPTS='--height 40% --reverse --border'
+
+# === Declarative Plugin Management ===
+#
+# RECOMMENDED: Declare your plugins in the array below (declarative mode)
+# WHY: Declarative is cleaner, version-controllable, and idiomatic
+#
+# Plugins auto-load on startup. No manual zap load commands needed!
+#
+# Format: 'owner/repo[@version][:subdir]'
+#
+plugins=(
+  # Uncomment popular plugins:
+  # 'zsh-users/zsh-completions'
+  # 'zsh-users/zsh-autosuggestions'
+  # 'zsh-users/zsh-syntax-highlighting'  # Load last for best results
+
+  # Fast syntax highlighting (faster alternative):
+  # 'z-shell/F-Sy-H'
+
+  # Oh-My-Zsh plugins (use colon notation):
+  # 'ohmyzsh/ohmyzsh:plugins/git'
+  # 'ohmyzsh/ohmyzsh:plugins/docker'
+  # 'ohmyzsh/ohmyzsh:plugins/kubectl'
+
+  # Version pinning:
+  # 'owner/repo@v1.0.0'      # Pin to tag
+  # 'owner/repo@main'        # Pin to branch
+  # 'owner/repo@abc123'      # Pin to commit
+)
+
+# === Zap Plugin Manager ===
+# Installed: __INSTALL_DATE__
+source "__ZAP_INSTALL_DIR__/zap.zsh"
+
+# NOTE: Plugins load automatically from the plugins=() array above
+
+# === Experimental Mode ===
+#
+# Want to try a plugin without committing? Use experimental mode:
+#   zap try owner/repo          # Load temporarily (gone after restart)
+#   zap adopt owner/repo        # Like it? Add to plugins=() array
+#   zap sync                    # Remove experimental, keep only declared
+#
+# Check what's running:
+#   zap status                  # Show declared vs experimental
+#   zap diff                    # Preview what sync would do
+
+# === What Zap Provides by Default ===
+#
+# You get these features automatically (based on Oh-My-Zsh):
+#
+# Smart History Search:
+#   - Up/Down arrows: Fuzzy history search (type "git" then Up → only git commands!)
+#   - Page Up/Down: Traditional full history navigation
+#   - Ctrl-R: Reverse incremental search
+#
+# Enhanced History:
+#   - 50,000 command history with timestamps
+#   - Deduplication (no duplicate commands)
+#   - History verification (shows !! expansion before running)
+#
+# Directory Navigation:
+#   - Auto-pushd: Directory stack automatically maintained
+#   - Quick navigation: ... for ../.., .... for ../../.., - for cd -
+#
+# Terminal Features:
+#   - Auto-updating titles (tab shows command, window shows full path)
+#   - Bracketed paste (prevents accidental execution of pasted commands)
+#   - URL auto-quoting
+#
+# Built-in Prompt:
+#   - Git-aware: Shows current branch
+#   - Color-coded: Green on success, red on failure
+#   - Smart user display: Shows user@host only on SSH/remote or when root
+#
+# Completion System:
+#   - Case-insensitive matching
+#   - Menu selection for multiple matches
+#   - Security validation (prevents world-writable directory exploits)
+#
+# Standard Keybindings:
+#   - Emacs mode by default (Ctrl-A, Ctrl-E, Ctrl-R, Ctrl-U, Ctrl-K, etc.)
+#   - Vi mode: Set 'bindkey -v' before sourcing zap.zsh
+#   - Home/End, Ctrl-Left/Right work in both modes
+
+# === Your Custom Configuration ===
+#
+# RECOMMENDED: Keep this file minimal and clean!
+# Put your customizations in ~/.zshrc.local instead (sourced automatically below)
+#
+# What goes in ~/.zshrc.local:
+#   - Aliases (ll, gs, gp, etc.)
+#   - Environment variables (EDITOR, PATH additions, etc.)
+#   - Custom functions
+#   - Tool initializations (nvm, pyenv, etc.)
+#   - Machine-specific configuration
+#
+# Example ~/.zshrc.local:
+#   export EDITOR=vim
+#   alias ll='ls -lah'
+#   alias gs='git status'
+#   mkcd() { mkdir -p "$1" && cd "$1"; }
+#
+# WHY: Separating user config from Zap config makes updates easier
+# and keeps this file version-controllable
+
+# === Advanced: Custom Prompt ===
+#
+# To use a custom prompt (Starship, Powerlevel10k, etc.):
+# 1. Set ZAP_DISABLE_PROMPT=true BEFORE sourcing zap.zsh (see top of file)
+# 2. Initialize your prompt here:
+#
+# Example with Starship:
+# eval "$(starship init zsh)"
+#
+# Example with Powerlevel10k:
+# plugins+=('romkatv/powerlevel10k')
+# [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
+
+# === Local Customizations ===
+#
+# Source ~/.zshrc.local for machine-specific customizations
+# WHY: Keeps this file clean and version-controllable
+[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
+
+# === Help ===
+#
+# Commands:
+#   zap help            Show all commands
+#   zap list            List installed plugins
+#   zap update          Update all plugins
+#   zap clean           Clean plugin cache
+#   zap doctor          Run diagnostics
+#
+# Documentation: https://github.com/astrosteveo/zap
