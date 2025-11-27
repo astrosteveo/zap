@@ -51,15 +51,13 @@ source "$ZAP_DIR/lib/downloader.zsh"
 source "$ZAP_DIR/lib/loader.zsh"
 source "$ZAP_DIR/lib/updater.zsh"
 source "$ZAP_DIR/lib/framework.zsh"
-source "$ZAP_DIR/lib/state.zsh"
-source "$ZAP_DIR/lib/declarative.zsh"
 
-# Auto-load plugins declared in plugins=() array (User Story 1)
-# WHY: Declarative plugin management allows users to declare desired state
-# in their .zshrc and have Zap automatically load all plugins on startup.
-# This eliminates repetitive imperative zap load commands.
-if [[ -n "${ZDOTDIR:-$HOME}/.zshrc" ]]; then
-  _zap_load_declared_plugins "${ZDOTDIR:-$HOME}/.zshrc" 2>/dev/null || true
+# Auto-load plugins declared in plugins=() array
+# WHY: Simple declarative approach - declare plugins, source zap, done.
+if (( ${#plugins[@]} )); then
+  for plugin in "${plugins[@]}"; do
+    _zap_load_plugin "$plugin"
+  done
 fi
 
 # Source defaults (sensible keybindings and completions)
@@ -79,9 +77,6 @@ if [[ "$enable_prompt" != 'no' ]]; then
   source "$ZAP_DIR/lib/prompt.zsh"
 fi
 
-# Source version manager support (nvm, rbenv, pyenv)
-# WHY: Auto-detect and lazy-load common version managers for zero-config experience
-source "$ZAP_DIR/lib/nvm.zsh"
 
 #
 # zap - Main command dispatcher
@@ -124,10 +119,6 @@ zap() {
     upgrade)
       _zap_cmd_upgrade "$@"
       ;;
-    # Declarative plugin management commands (Feature 002)
-    try|sync|status|diff|adopt)
-      _zap_declarative_dispatch "$subcommand" "$@"
-      ;;
     help|--help|-h)
       _zap_cmd_help "$@"
       ;;
@@ -151,28 +142,22 @@ _zap_cmd_help() {
 Zap - Lightweight Zsh Plugin Manager
 
 Usage:
-  zap update [<plugin>]
-  zap list [--verbose]
-  zap clean [--all]
-  zap doctor
-  zap upgrade
-  zap help [<command>]
-
-Declarative Usage (Recommended):
-  zap try <owner>/<repo>
-  zap adopt <owner>/<repo>
-  zap sync
-  zap status
-  zap diff
+  zap update [<plugin>]    Update plugins
+  zap list [--verbose]     List installed plugins
+  zap clean [--all]        Remove unused plugin caches
+  zap doctor               Run diagnostics
+  zap upgrade              Update Zap itself
+  zap help                 Show this help
 
 Examples:
-  zap try zsh-users/zsh-syntax-highlighting
-  zap adopt zsh-users/zsh-syntax-highlighting
-  zap update
-  zap upgrade
-  zap list
+  # In your .zshrc, declare plugins:
+  plugins=(
+    'zsh-users/zsh-autosuggestions'
+    'zsh-users/zsh-syntax-highlighting'
+    'ohmyzsh/ohmyzsh:plugins/git'
+  )
+  source ~/.zap/zap.zsh
 
-For more help: zap help <command>
 Documentation: https://github.com/astrosteveo/zap
 EOF
 
@@ -263,34 +248,18 @@ _zap_cmd_update() {
 }
 
 #
-# _zap_cmd_list - List installed plugins with status
-#
-# Purpose: Display all cached plugins and their versions
-# Parameters:
-#   --verbose: Show detailed information
-# Returns: 0 always
-#
-# WHY: Enable users to see what's installed (FR-007, cli-interface.md)
-#
-# T119: Now shows plugin source (declarative vs imperative)
+# _zap_cmd_list - List installed plugins
 #
 _zap_cmd_list() {
   local verbose=0
+  [[ "$1" == "--verbose" ]] && verbose=1
 
-  # Parse flags
-  if [[ "$1" == "--verbose" ]]; then
-    verbose=1
-  fi
-
-  # Load metadata and state
   _zap_load_metadata
-  _zap_load_state 2>/dev/null || true
 
-  # Get installed plugins
-  local plugins
-  plugins=($(_zap_list_installed_plugins))
+  local installed_plugins
+  installed_plugins=($(_zap_list_installed_plugins))
 
-  if [[ ${#plugins[@]} -eq 0 ]]; then
+  if [[ ${#installed_plugins[@]} -eq 0 ]]; then
     echo "No plugins installed"
     echo ""
     echo "Add plugins to your ~/.zshrc:"
@@ -301,74 +270,26 @@ _zap_cmd_list() {
   echo "Installed plugins:"
   echo ""
 
-  # List each plugin
-  for plugin in "${plugins[@]}"; do
+  for plugin in "${installed_plugins[@]}"; do
     local owner="${plugin%%/*}"
     local repo="${plugin##*/}"
     local plugin_id="$(_zap_get_plugin_identifier "$owner" "$repo")"
-    local cache_dir="$(_zap_get_plugin_cache_dir "$owner" "$repo")"
 
-    # Get metadata
-    local version="${ZAP_PLUGIN_META[${plugin_id}:version]:-unknown}"
-    local plugin_status="${ZAP_PLUGIN_META[${plugin_id}:status]:-unknown}"
+    local version="${ZAP_PLUGIN_META[${plugin_id}:version]:-latest}"
     local commit="${ZAP_PLUGIN_META[${plugin_id}:commit]:-unknown}"
-    local last_check="${ZAP_PLUGIN_META[${plugin_id}:last_check]:-never}"
-
-    # T119: Get plugin source from state (declarative vs imperative)
-    local plugin_source="imperative"
-    local source_label="(unknown)"
-    if [[ -n "${_zap_plugin_state[$plugin_id]}" ]]; then
-      local metadata="${_zap_plugin_state[$plugin_id]}"
-      local state_field="${${(@s:|:)metadata}[1]}"
-      local source_field="${${(@s:|:)metadata}[6]}"
-
-      if [[ "$state_field" == "declared" ]]; then
-        plugin_source="declarative"
-        source_label="(array)"
-      elif [[ "$source_field" == "try_command" ]]; then
-        plugin_source="experimental"
-        source_label="(zap try)"
-      fi
-    fi
-
-    # Detect framework plugins
-    local framework_note=""
-    if [[ "$owner" == "ohmyzsh" || "$owner" == "sorin-ionescu" ]]; then
-      framework_note=" framework"
-    fi
 
     if [[ $verbose -eq 1 ]]; then
-      # Verbose output
       echo "  $plugin_id"
-      echo "    Version:  ${version:-latest}"
-      echo "    Commit:   ${commit:0:12}"
-      echo "    Status:   ✓ $plugin_status$framework_note"
-      echo "    Source:   $plugin_source $source_label"
-      echo "    Checked:  $last_check"
+      echo "    Version: $version"
+      echo "    Commit:  ${commit:0:12}"
       echo ""
     else
-      # Compact output
-      local status_symbol="✓"
-      [[ "$plugin_status" == "failed" ]] && status_symbol="✗"
-      [[ "$plugin_status" == "disabled" ]] && status_symbol="○"
-
-      printf "  %-40s %-15s %s %-10s %s\n" \
-        "$plugin_id" \
-        "${version:-latest}" \
-        "$status_symbol" \
-        "$plugin_status" \
-        "$source_label$framework_note"
+      printf "  %-40s %s\n" "$plugin_id" "$version"
     fi
   done
 
-  if [[ $verbose -eq 0 ]]; then
-    echo ""
-  fi
-
-  echo "Total: ${#plugins[@]} plugin(s)"
   echo ""
-  echo "Run 'zap list --verbose' for detailed information"
-
+  echo "Total: ${#installed_plugins[@]} plugin(s)"
   return 0
 }
 
@@ -429,49 +350,36 @@ _zap_cmd_clean() {
     echo "Clean complete. Restart your shell to reload plugins."
     return 0
   else
-    # Clean orphaned caches (plugins not in current config)
+    # Clean orphaned caches (plugins not in current plugins=() array)
     echo "Scanning for orphaned plugin caches..."
 
-    # Load metadata to find installed plugins
-    _zap_load_metadata
+    # Build list of active plugins from plugins=() array
+    local -a active_plugins
+    for plugin in "${plugins[@]}"; do
+      local parsed=$(_zap_parse_spec "$plugin")
+      local owner="${parsed%%/*}"
+      local repo="${${parsed#*/}%%@*}"
+      repo="${repo%%:*}"
+      active_plugins+=("${owner}__${repo}")
+    done
 
-    # Get list of plugins from .zshrc
-    local zshrc="${ZDOTDIR:-$HOME}/.zshrc"
-    local active_plugins=()
-
-    # Load declared plugins from state (more reliable than parsing zshrc)
-    _zap_load_state
-    local -a declared_plugins
-    declared_plugins=($(_zap_list_declared_plugins))
-    active_plugins+=("${declared_plugins[@]//\//__}")
-
-    # Find orphaned caches
     local orphaned_count=0
     local reclaimed_space=0
 
     for cache_dir in "$ZAP_PLUGIN_DIR"/*; do
       [[ ! -d "$cache_dir" ]] && continue
 
-      local cache_name=$(basename "$cache_dir")
-
-      # Check if this plugin is active
+      local cache_name="${cache_dir:t}"
       local is_active=0
+
       for active in "${active_plugins[@]}"; do
-        if [[ "$active" == "$cache_name" ]]; then
-          is_active=1
-          break
-        fi
+        [[ "$active" == "$cache_name" ]] && { is_active=1; break }
       done
 
       if [[ $is_active -eq 0 ]]; then
-        # Orphaned cache - calculate size
         local size_kb=$(du -sk "$cache_dir" 2>/dev/null | awk '{print $1}')
         reclaimed_space=$((reclaimed_space + size_kb))
-
-        # Convert cache name back to owner/repo for display
-        local display_name="${cache_name/__//}"
-        echo "  Removing: $display_name"
-
+        echo "  Removing: ${cache_name/__//}"
         rm -rf "$cache_dir" 2>/dev/null
         orphaned_count=$((orphaned_count + 1))
       fi
@@ -480,10 +388,9 @@ _zap_cmd_clean() {
     if [[ $orphaned_count -eq 0 ]]; then
       echo "No orphaned caches found."
     else
-      local reclaimed_mb=$((reclaimed_space / 1024))
       echo ""
       echo "Removed $orphaned_count orphaned cache(s)"
-      echo "Reclaimed ${reclaimed_mb}MB of disk space"
+      echo "Reclaimed $((reclaimed_space / 1024))MB of disk space"
     fi
 
     return 0

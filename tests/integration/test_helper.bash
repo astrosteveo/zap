@@ -112,49 +112,6 @@ wait_for_file() {
   [[ -f "$file" ]]
 }
 
-# Custom helper: Count plugins in state file
-count_declared_plugins() {
-  if [[ ! -f "$ZAP_DATA_DIR/state.zsh" ]]; then
-    echo "0"
-    return
-  fi
-
-  # Source state file and count declared plugins
-  (
-    source "$ZAP_DATA_DIR/state.zsh" 2>/dev/null || true
-    local count=0
-    for key in "${(@k)_zap_plugin_state}"; do
-      local metadata="${_zap_plugin_state[$key]}"
-      local state="${${(@s:|:)metadata}[1]}"
-      if [[ "$state" == "declared" ]]; then
-        ((count++))
-      fi
-    done
-    echo "$count"
-  )
-}
-
-count_experimental_plugins() {
-  if [[ ! -f "$ZAP_DATA_DIR/state.zsh" ]]; then
-    echo "0"
-    return
-  fi
-
-  # Source state file and count experimental plugins
-  (
-    source "$ZAP_DATA_DIR/state.zsh" 2>/dev/null || true
-    local count=0
-    for key in "${(@k)_zap_plugin_state}"; do
-      local metadata="${_zap_plugin_state[$key]}"
-      local state="${${(@s:|:)metadata}[1]}"
-      if [[ "$state" == "experimental" ]]; then
-        ((count++))
-      fi
-    done
-    echo "$count"
-  )
-}
-
 # Export test root directory
 export BATS_TEST_DIRNAME="${BATS_TEST_DIRNAME:-$(dirname "${BASH_SOURCE[0]}")}"
 export ZAP_ROOT="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"

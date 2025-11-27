@@ -1,11 +1,45 @@
 #!/usr/bin/env zsh
 #
-# defaults.zsh - Default keybindings and minimal completion system
+# defaults.zsh - Sensible defaults for zsh
 #
-# WHY: Provide sensible defaults so users have a working terminal immediately
-# after installation without configuration (per FR-011, FR-012, User Story 3)
+# Provides: keybindings, completions, history, PATH, ls colors, and more
+# Goal: A great shell experience out of the box
+
 #
-# Based on Oh-My-Zsh key-bindings.zsh with Zap-specific enhancements
+# PATH - Add common user directories
+#
+typeset -U path  # Remove duplicates
+path=(
+  ~/.local/bin
+  $path
+)
+
+#
+# ls with colors
+#
+if (( $+commands[eza] )); then
+  # Modern ls replacement with better defaults
+  alias ls='eza --group-directories-first'
+  alias ll='eza -la --group-directories-first --git'
+  alias la='eza -a --group-directories-first'
+  alias lt='eza --tree --level=2'
+elif (( $+commands[gls] )); then
+  # GNU ls on macOS (via coreutils)
+  alias ls='gls --color=auto --group-directories-first'
+  alias ll='gls -lah --color=auto --group-directories-first'
+  alias la='gls -a --color=auto --group-directories-first'
+elif [[ "$OSTYPE" == darwin* ]]; then
+  # macOS BSD ls
+  export CLICOLOR=1
+  alias ls='ls -G'
+  alias ll='ls -lah'
+  alias la='ls -a'
+else
+  # GNU ls on Linux
+  alias ls='ls --color=auto --group-directories-first'
+  alias ll='ls -lah --color=auto --group-directories-first'
+  alias la='ls -a --color=auto --group-directories-first'
+fi
 
 # Reference documentation:
 # http://zsh.sourceforge.net/Doc/Release/Zsh-Line-Editor.html
