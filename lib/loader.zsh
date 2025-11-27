@@ -9,6 +9,44 @@
 source "${0:A:h}/utils.zsh"
 
 #
+# _zap_load_plugin - Load a plugin (download if needed, then source)
+#
+# Purpose: Main entry point for loading a plugin from spec
+# Parameters:
+#   $1 - Plugin specification (owner/repo[@version][:subdir])
+# Returns: 0 on success, 1 on failure
+#
+_zap_load_plugin() {
+  local spec="$1"
+
+  # Parse the plugin specification (returns owner|repo|version|subdir)
+  local parsed
+  parsed=$(_zap_parse_spec "$spec") || return 1
+
+  # Split pipe-separated values
+  local owner repo version subdir
+  owner="${parsed%%|*}"
+  local rest="${parsed#*|}"
+  repo="${rest%%|*}"
+  rest="${rest#*|}"
+  version="${rest%%|*}"
+  subdir="${rest#*|}"
+
+  local cache_dir="${ZAP_PLUGIN_DIR}/${owner}__${repo}"
+
+  # Download if not cached, or add subdir to existing sparse checkout
+  if [[ ! -d "$cache_dir" ]] || [[ -n "$subdir" ]]; then
+    _zap_clone_plugin "$owner" "$repo" "$version" "$subdir" || return 1
+  fi
+
+  # Add to fpath for completions
+  _zap_add_to_fpath "$cache_dir"
+
+  # Source the plugin
+  _zap_source_plugin "$owner" "$repo" "$subdir"
+}
+
+#
 # _zap_find_plugin_file - Locate plugin entry point file
 #
 # Purpose: Find the correct plugin file to source based on priority order

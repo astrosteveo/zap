@@ -38,10 +38,18 @@ _zap_parse_spec() {
   # Skip empty lines and comments
   [[ -z "$spec" || "$spec" == \#* ]] && return 1
 
-  # Extract path annotation if present (FR-005)
+  # Extract subdirectory if present (FR-005)
+  # Supports both formats:
+  #   owner/repo:subdir (simple, recommended)
+  #   owner/repo path:subdir (legacy)
   if [[ "$spec" == *" path:"* ]]; then
+    # Legacy format: owner/repo path:subdir
     subdir="${spec##* path:}"
     spec="${spec%% path:*}"
+  elif [[ "$spec" == *:* && "$spec" != *@*:* ]]; then
+    # Simple format: owner/repo:subdir (but not owner/repo@v1:something)
+    subdir="${spec#*:}"
+    spec="${spec%%:*}"
   else
     subdir=""
   fi
